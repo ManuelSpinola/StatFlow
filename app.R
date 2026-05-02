@@ -1,5 +1,5 @@
 # ============================================================
-# app.R — Punto de entrada de StatLab
+# app.R — Punto de entrada de AnalizApp
 #
 # Este archivo SOLO:
 #   1. Carga librerías y helpers compartidos
@@ -33,7 +33,7 @@ ui <- page_navbar(
   nav_panel("❓ Ayuda",           mod_ayuda_ui("ayuda")),
 
   nav_spacer(),
-  nav_item(tags$span(class = "text-muted small", "StatLab v2.0"))
+  nav_item(tags$span(class = "text-muted small", "AnalizApp v2.0"))
 )
 
 # ── 4. Server ──────────────────────────────────────────────

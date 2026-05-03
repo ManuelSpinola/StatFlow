@@ -1,6 +1,7 @@
 # AnalizApp
 
-Herramienta de análisis y visualización de datos para usuarios sin experiencia en estadística.
+Herramienta de análisis y visualización de datos para usuarios sin experiencia en programación ni estadística.
+    Parte de la suite Stat de herramientas educativas para ciencia de datos.
 Versión 2.0 — arquitectura modular.
 
 ## Estructura del proyecto

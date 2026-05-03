@@ -23,7 +23,14 @@ source("modules/mod_ayuda.R")
 
 # ── 3. UI ──────────────────────────────────────────────────
 ui <- page_navbar(
-  title  = "📊 StatFlow",
+  title = div(
+    style = "display: flex; align-items: center; gap: 10px; margin-top: 4px;",
+    img(
+      src    = "hexsticker_StatFlow.png",
+      height = "38px"
+    ),
+    span("StatFlow", style = "font-weight: 600;")
+  ),
   theme  = tema_app,
   lang   = "es",
   footer = div(
@@ -32,12 +39,12 @@ ui <- page_navbar(
     "Manuel Spínola · ICOMVIS · Universidad Nacional · Costa Rica"
   ),
 
-  nav_panel("📂 Mis datos",      mod_datos_ui("datos")),
-  nav_panel("🔍 Explorar",       mod_explorar_ui("explorar")),
-  nav_panel("📈 Gráficos",       mod_graficos_ui("graficos")),
-  nav_panel("⚖️ Comparar medias", mod_medias_ui("medias")),
+  nav_panel("📂 Mis datos",           mod_datos_ui("datos")),
+  nav_panel("🔍 Explorar",            mod_explorar_ui("explorar")),
+  nav_panel("📈 Gráficos",            mod_graficos_ui("graficos")),
+  nav_panel("⚖️ Comparar medias",     mod_medias_ui("medias")),
   nav_panel("📊 Comparar frecuencias", mod_frecuencias_ui("frecuencias")),
-  nav_panel("❓ Ayuda",           mod_ayuda_ui("ayuda")),
+  nav_panel("❓ Ayuda",                mod_ayuda_ui("ayuda")),
 
   nav_spacer(),
   nav_item(tags$span(class = "text-muted small", "StatFlow v2.0"))
@@ -52,7 +59,7 @@ server <- function(input, output, session) {
 
   mod_explorar_server("explorar", datos = datos_activos)
   mod_graficos_server("graficos", datos = datos_activos)
-  mod_medias_server("medias", datos = datos_activos)
+  mod_medias_server("medias",     datos = datos_activos)
   mod_frecuencias_server("frecuencias", datos = datos_activos)
   mod_ayuda_server("ayuda")
 }

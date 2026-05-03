@@ -56,12 +56,13 @@ tema_app <- bs_theme(
   bootswatch   = NULL
 ) |>
   bs_add_rules("
-    .navbar { background-color: #1170AA !important; }
-    .navbar-brand, .nav-link { color: #ffffff !important; }
-    .nav-link.active { border-bottom: 2px solid #FC7D0B; }
-    .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
-    .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
-  ")
+  .navbar { background-color: #1170AA !important; }
+  .navbar-brand, .nav-link { color: #ffffff !important; }
+  .nav-link.active { border-bottom: 2px solid #FC7D0B; }
+  .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
+  .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
+  .navbar-brand { display: flex !important; align-items: center !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+")
 
 # ── Escala de color para gráficos (ggplot2) ───────────────
 # Uso: + scale_fill_tableau_cb() o + scale_color_tableau_cb()

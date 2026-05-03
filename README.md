@@ -1,4 +1,4 @@
-# StatLab 🌿
+# AnalizApp
 
 Herramienta de análisis y visualización de datos para usuarios sin experiencia estadística.
 Versión 2.0 — arquitectura modular.

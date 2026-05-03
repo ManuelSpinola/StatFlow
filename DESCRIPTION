@@ -1,13 +1,14 @@
-Package: AnalizApp
-Title: AnalizApp - Herramienta de análisis de datos
+Package: StatFlow
+Title: StatFlow - Análisis estadístico y visualización de datos
 Version: 2.0.0
-Description: Aplicación Shiny modular para análisis y visualización de datos,
-    orientada a usuarios sin experiencia en estadística.
+Description: Aplicación Shiny modular para análisis estadístico y visualización de datos,
+    orientada a usuarios sin experiencia en programación ni estadística.
+    Parte de la suite Stat de herramientas educativas para ciencia de datos.
 Authors@R: person(
     given  = "Manuel",
     family = "Spínola",
     role   = c("aut", "cre"),
-    email  = "mspinola@una.ac.cr"
+    email  = "romeo.spinola.parallada@una.cr"
   )
 Depends: R (>= 4.1.0)
 Imports:
@@ -15,8 +16,9 @@ Imports:
     bslib,
     bsicons,
     tidyverse,
+    easystats,
     readxl,
     DT,
     scales,
-    effectsize
+    DescTools
 License: MIT

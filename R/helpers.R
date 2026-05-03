@@ -1,27 +1,44 @@
 # ============================================================
 # helpers.R — Funciones y objetos compartidos entre módulos
+# Paleta: Tableau Color Blind (ggthemes)
 # ============================================================
 
 library(shiny)
 library(bslib)
 library(tidyverse)
+library(easystats)
 library(readxl)
 library(DT)
 library(scales)
-library(effectsize)
+library(DescTools)
+library(ggthemes)
 
 # ── Paleta de colores AnalizApp ────────────────────────────
-# Opción E — Teal académico + Rojo institucional UNA
+# Tableau Color Blind — accesible y profesional
 colores <- list(
-  fondo       = "#F0FAF7",  # verde agua pálido — fondo general
-  primario    = "#0D6E56",  # teal oscuro — navbar, encabezados
-  acento      = "#1D9E75",  # teal vibrante — botones, íconos activos
-  texto       = "#4A4A4A",  # gris oscuro — texto principal
-  una         = "#A93226",  # rojo UNA — acento institucional
-  exito       = "#27AE60",  # verde — valores positivos en gráficos
-  advertencia = "#E9C46A",  # ámbar — valores medios
-  peligro     = "#C0392B",  # rojo — valores negativos o errores
-  borde       = "#C8EBE0"   # verde pálido — bordes y separadores
+  fondo       = "#F4F7FB",  # azul muy pálido — fondo general
+  primario    = "#1170AA",  # azul oscuro — navbar, encabezados
+  acento      = "#FC7D0B",  # naranja — botones, íconos activos
+  secundario  = "#5FA2CE",  # azul claro — elementos secundarios
+  texto       = "#57606C",  # gris oscuro — texto principal
+  exito       = "#5FA2CE",  # azul claro — valores positivos
+  advertencia = "#F1CE63",  # amarillo — badge categórica, valores medios
+  peligro     = "#C85200",  # naranja oscuro — errores, outliers
+  borde       = "#C8D9EC",  # azul muy pálido — bordes y separadores
+
+  # Paleta completa Tableau Color Blind para gráficos
+  tableau = c(
+    "#1170AA", # azul oscuro
+    "#FC7D0B", # naranja
+    "#A3ACB9", # gris medio
+    "#57606C", # gris oscuro
+    "#C85200", # naranja oscuro
+    "#7BC8ED", # azul cielo
+    "#5FA2CE", # azul claro
+    "#F1CE63", # amarillo
+    "#9F8B75", # marrón
+    "#B85A0D"  # marrón naranja
+  )
 )
 
 # ── Tema visual ────────────────────────────────────────────
@@ -30,7 +47,7 @@ tema_app <- bs_theme(
   bg           = colores$fondo,
   fg           = colores$texto,
   primary      = colores$primario,
-  secondary    = colores$acento,
+  secondary    = colores$secundario,
   success      = colores$exito,
   danger       = colores$peligro,
   warning      = colores$advertencia,
@@ -39,12 +56,21 @@ tema_app <- bs_theme(
   bootswatch   = NULL
 ) |>
   bs_add_rules("
-    .navbar { background-color: #0D6E56 !important; }
+    .navbar { background-color: #1170AA !important; }
     .navbar-brand, .nav-link { color: #ffffff !important; }
-    .nav-link.active { border-bottom: 2px solid #A93226; }
-    .btn-primary { background-color: #A93226; border-color: #A93226; }
-    .btn-primary:hover { background-color: #8a2720; border-color: #8a2720; }
+    .nav-link.active { border-bottom: 2px solid #FC7D0B; }
+    .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
+    .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
   ")
+
+# ── Escala de color para gráficos (ggplot2) ───────────────
+# Uso: + scale_fill_tableau_cb() o + scale_color_tableau_cb()
+scale_fill_tableau_cb <- function(...) {
+  scale_fill_manual(values = colores$tableau, ...)
+}
+scale_color_tableau_cb <- function(...) {
+  scale_color_manual(values = colores$tableau, ...)
+}
 
 # ── Leer archivo CSV o Excel ───────────────────────────────
 leer_archivo <- function(path, ext) {
@@ -81,17 +107,29 @@ resumen_numerico <- function(df, col) {
 }
 
 # ── Datasets de ejemplo ────────────────────────────────────
+set.seed(42)
+
 datos_ejemplo <- list(
-  fauna = tibble(
-    especie       = sample(c("Danta", "Pizote", "Tepezcuintle", "Puma"), 60, replace = TRUE),
-    zona          = sample(c("Norte", "Sur", "Este"), 60, replace = TRUE),
-    peso_kg       = round(c(
-      rnorm(15, 200, 20), rnorm(15, 4.5, 0.8),
-      rnorm(15, 8, 1.5),  rnorm(15, 55, 10)
-    ), 1),
-    avistamientos = sample(1:15, 60, replace = TRUE),
-    mes           = sample(month.name[1:6], 60, replace = TRUE)
-  ),
+  fauna = {
+    # Pesos realistas por especie (Costa Rica)
+    # Danta (Tapirus bairdii): 150-300 kg
+    # Puma (Puma concolor): 40-80 kg
+    # Tepezcuintle (Cuniculus paca): 6-12 kg
+    # Pizote (Nasua narica): 3-6 kg
+    n_por_especie <- 15
+    tibble(
+      especie = rep(c("Danta", "Puma", "Tepezcuintle", "Pizote"), each = n_por_especie),
+      zona    = sample(c("Norte", "Sur", "Este"), n_por_especie * 4, replace = TRUE),
+      peso_kg = round(c(
+        rnorm(n_por_especie, mean = 220, sd = 25),   # Danta
+        rnorm(n_por_especie, mean = 58,  sd = 8),    # Puma
+        rnorm(n_por_especie, mean = 8.5, sd = 1.2),  # Tepezcuintle
+        rnorm(n_por_especie, mean = 4.2, sd = 0.6)   # Pizote
+      ), 1),
+      avistamientos = sample(1:15, n_por_especie * 4, replace = TRUE),
+      mes           = sample(month.name[1:6], n_por_especie * 4, replace = TRUE)
+    )
+  },
   arboles = tibble(
     especie   = sample(c("Ceibo", "Guanacaste", "Pochote", "Cristóbal"), 50, replace = TRUE),
     parcela   = sample(paste("Parcela", 1:5), 50, replace = TRUE),

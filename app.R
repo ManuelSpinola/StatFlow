@@ -1,5 +1,5 @@
 # ============================================================
-# app.R — Punto de entrada de AnalizApp
+# app.R — Punto de entrada de StatFlow
 #
 # Este archivo SOLO:
 #   1. Carga librerías y helpers compartidos
@@ -17,23 +17,30 @@ source("R/helpers.R")
 source("modules/mod_datos.R")
 source("modules/mod_explorar.R")
 source("modules/mod_graficos.R")
-source("modules/mod_comparar.R")
+source("modules/mod_medias.R")
+source("modules/mod_frecuencias.R")
 source("modules/mod_ayuda.R")
 
 # ── 3. UI ──────────────────────────────────────────────────
 ui <- page_navbar(
-  title  = "🌿 AnalizApp",
+  title  = "📊 StatFlow",
   theme  = tema_app,
   lang   = "es",
+  footer = div(
+    class = "text-center text-muted small py-2",
+    style = paste0("border-top: 1px solid ", colores$borde, ";"),
+    "Manuel Spínola · ICOMVIS · Universidad Nacional · Costa Rica"
+  ),
 
   nav_panel("📂 Mis datos",      mod_datos_ui("datos")),
   nav_panel("🔍 Explorar",       mod_explorar_ui("explorar")),
-  nav_panel("📊 Gráficos",       mod_graficos_ui("graficos")),
-  nav_panel("⚖️ Comparar grupos", mod_comparar_ui("comparar")),
+  nav_panel("📈 Gráficos",       mod_graficos_ui("graficos")),
+  nav_panel("⚖️ Comparar medias", mod_medias_ui("medias")),
+  nav_panel("📊 Comparar frecuencias", mod_frecuencias_ui("frecuencias")),
   nav_panel("❓ Ayuda",           mod_ayuda_ui("ayuda")),
 
   nav_spacer(),
-  nav_item(tags$span(class = "text-muted small", "AnalizApp v2.0"))
+  nav_item(tags$span(class = "text-muted small", "StatFlow v2.0"))
 )
 
 # ── 4. Server ──────────────────────────────────────────────
@@ -45,7 +52,8 @@ server <- function(input, output, session) {
 
   mod_explorar_server("explorar", datos = datos_activos)
   mod_graficos_server("graficos", datos = datos_activos)
-  mod_comparar_server("comparar", datos = datos_activos)
+  mod_medias_server("medias", datos = datos_activos)
+  mod_frecuencias_server("frecuencias", datos = datos_activos)
   mod_ayuda_server("ayuda")
 }
 

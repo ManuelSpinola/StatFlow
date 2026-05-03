@@ -44,6 +44,54 @@ mod_datos_ui <- function(id) {
         card_body(
           uiOutput(ns("info_columnas")),
           hr(),
+          accordion(
+            open = FALSE,
+            accordion_panel(
+              "📖 ¿Qué tipos de variables existen?",
+              layout_columns(
+                col_widths = c(6, 6),
+                # Numérica
+                card(
+                  class = "border-0 bg-light",
+                  card_body(
+                    tags$span(
+                      class = "badge mb-2",
+                      style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
+                      "Numérica"
+                    ),
+                    p("Representa cantidades medibles.", class = "small mb-2"),
+                    tags$ul(
+                      class = "small mb-0",
+                      tags$li(tags$strong("Discreta:"), " valores enteros contables. ",
+                              tags$em("Ej: número de individuos, cantidad de huevos")),
+                      tags$li(tags$strong("Continua:"), " cualquier valor en un rango. ",
+                              tags$em("Ej: peso, temperatura, altura"))
+                    )
+                  )
+                ),
+                # Categórica
+                card(
+                  class = "border-0 bg-light",
+                  card_body(
+                    tags$span(
+                      class = "badge mb-2",
+                      style = paste0("background-color:", colores$advertencia, "; color:#633806;"),
+                      "Categórica"
+                    ),
+                    p("Representa grupos o etiquetas.", class = "small mb-2"),
+                    tags$ul(
+                      class = "small mb-0",
+                      tags$li(tags$strong("Nominal:"), " sin orden entre categorías. ",
+                              tags$em("Ej: especie, color, sexo")),
+                      tags$li(tags$strong("Ordinal:"), " con orden definido. ",
+                              tags$em("Ej: nivel educativo, intensidad del dolor"))
+                    )
+                  )
+                )
+              )
+            )
+          ),
+          br(),
           DTOutput(ns("tabla_preview"))
         )
       )

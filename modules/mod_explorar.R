@@ -112,7 +112,7 @@ mod_explorar_server <- function(id, datos) {
       estilo <- if (tipo_actual() == "Numérica")
         paste0("background-color:", colores$primario, "; color:#ffffff;")
       else
-        paste0("background-color:", colores$advertencia, "; color:#633806;")
+        paste0("background-color:", colores$acento, "; color:#ffffff;")
       tags$span(
         class = "badge fs-6",
         style = estilo,

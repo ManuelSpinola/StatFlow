@@ -11,11 +11,12 @@ library(performance)
 library(effectsize)
 library(bayestestR)
 library(datawizard)
+library(modelbased)
+library(report)
 library(insight)
 library(readxl)
 library(DT)
 library(scales)
-library(DescTools)
 library(ggthemes)
 
 # ── Paleta de colores AnalizApp ────────────────────────────

@@ -1,7 +1,7 @@
 # ============================================================
 # mod_frecuencias.R — Comparación de frecuencias / proporciones
-#   · IC 95% por grupo con DescTools::BinomCI
-#   · Diferencia de proporciones con DescTools::BinomDiffCI
+#   · IC 95% por grupo con prop.test() (R base)
+#   · Diferencia de proporciones con prop.test()
 #   · Gráfico geom_pointrange: proporciones + diferencia cruda
 # ============================================================
 
@@ -70,22 +70,14 @@ mod_frecuencias_server <- function(id, datos) {
     # ── Variable de resultado (categórica) ──
     output$sel_var_resultado <- renderUI({
       req(length(cols_cat()) > 0)
-      selectInput(
-        ns("var_resultado"),
-        "Variable de resultado:",
-        choices = cols_cat()
-      )
+      selectInput(ns("var_resultado"), "Variable de resultado:", choices = cols_cat())
     })
 
     # ── Categoría de interés ──
     output$sel_categoria <- renderUI({
       req(input$var_resultado, datos())
       cats <- sort(unique(as.character(datos()[[input$var_resultado]])))
-      selectInput(
-        ns("categoria"),
-        "Categoría de interés:",
-        choices = cats
-      )
+      selectInput(ns("categoria"), "Categoría de interés:", choices = cats)
     })
 
     # ── Variable de grupo ──
@@ -93,11 +85,7 @@ mod_frecuencias_server <- function(id, datos) {
       req(length(cols_cat()) > 0)
       otras <- setdiff(cols_cat(), input$var_resultado)
       req(length(otras) > 0)
-      selectInput(
-        ns("var_grupo"),
-        "Variable de grupos:",
-        choices = otras
-      )
+      selectInput(ns("var_grupo"), "Variable de grupos:", choices = otras)
     })
 
     # ── Selector de dos grupos específicos ──
@@ -143,38 +131,48 @@ mod_frecuencias_server <- function(id, datos) {
              paste0("La categoría '", input$categoria, "' no aparece en ninguno de los grupos."))
       )
 
-      # ── IC 95% por grupo ──
-      ic_a <- DescTools::BinomCI(x_a, n_a)
-      ic_b <- DescTools::BinomCI(x_b, n_b)
+      # ── IC 95% por grupo con prop.test() (R base) ──
+      pt_a <- prop.test(x_a, n_a, conf.level = 0.95, correct = FALSE)
+      pt_b <- prop.test(x_b, n_b, conf.level = 0.95, correct = FALSE)
 
-      prop_a <- ic_a[, "est"]
-      prop_b <- ic_b[, "est"]
+      prop_a <- pt_a$estimate
+      prop_b <- pt_b$estimate
 
-      # ── IC 95% diferencia de proporciones ──
-      ic_dif <- DescTools::BinomDiffCI(x_a, n_a, x_b, n_b)
+      ic_a <- list(est    = prop_a,
+                   lwr.ci = pt_a$conf.int[1],
+                   upr.ci = pt_a$conf.int[2])
+      ic_b <- list(est    = prop_b,
+                   lwr.ci = pt_b$conf.int[1],
+                   upr.ci = pt_b$conf.int[2])
+
+      # ── IC 95% diferencia de proporciones con prop.test() ──
+      pt_dif <- prop.test(c(x_a, x_b), c(n_a, n_b), conf.level = 0.95, correct = FALSE)
+      ic_dif <- list(est    = prop_a - prop_b,
+                     lwr.ci = pt_dif$conf.int[1],
+                     upr.ci = pt_dif$conf.int[2])
 
       # ── Tabla resumen para gráfico ──
       resumen <- tibble(
         grupo = c(input$grupo_a, input$grupo_b),
         prop  = c(prop_a, prop_b),
-        lwr   = c(ic_a[, "lwr.ci"], ic_b[, "lwr.ci"]),
-        upr   = c(ic_a[, "upr.ci"], ic_b[, "upr.ci"])
+        lwr   = c(ic_a$lwr.ci, ic_b$lwr.ci),
+        upr   = c(ic_a$upr.ci, ic_b$upr.ci)
       )
 
       list(
-        grupo_a    = input$grupo_a,
-        grupo_b    = input$grupo_b,
-        categoria  = input$categoria,
-        variable   = input$var_resultado,
-        var_grupo  = input$var_grupo,
+        grupo_a   = input$grupo_a,
+        grupo_b   = input$grupo_b,
+        categoria = input$categoria,
+        variable  = input$var_resultado,
+        var_grupo = input$var_grupo,
         x_a = x_a, n_a = n_a,
         x_b = x_b, n_b = n_b,
-        prop_a     = round(prop_a, 3),
-        prop_b     = round(prop_b, 3),
-        ic_a       = ic_a,
-        ic_b       = ic_b,
-        ic_dif     = ic_dif,
-        resumen    = resumen
+        prop_a    = round(prop_a, 3),
+        prop_b    = round(prop_b, 3),
+        ic_a      = ic_a,
+        ic_b      = ic_b,
+        ic_dif    = ic_dif,
+        resumen   = resumen
       )
     })
 
@@ -193,8 +191,8 @@ mod_frecuencias_server <- function(id, datos) {
             title    = paste0("Proporción — ", res$grupo_a,
                               " (", res$x_a, "/", res$n_a, ")"),
             value    = paste0(round(res$prop_a * 100, 1), "%",
-                              "  [", round(res$ic_a[, "lwr.ci"] * 100, 1),
-                              "–", round(res$ic_a[, "upr.ci"] * 100, 1), "%]"),
+                              "  [", round(res$ic_a$lwr.ci * 100, 1),
+                              "–", round(res$ic_a$upr.ci * 100, 1), "%]"),
             showcase = bsicons::bs_icon("pie-chart-fill"),
             theme    = "primary"
           ),
@@ -202,8 +200,8 @@ mod_frecuencias_server <- function(id, datos) {
             title    = paste0("Proporción — ", res$grupo_b,
                               " (", res$x_b, "/", res$n_b, ")"),
             value    = paste0(round(res$prop_b * 100, 1), "%",
-                              "  [", round(res$ic_b[, "lwr.ci"] * 100, 1),
-                              "–", round(res$ic_b[, "upr.ci"] * 100, 1), "%]"),
+                              "  [", round(res$ic_b$lwr.ci * 100, 1),
+                              "–", round(res$ic_b$upr.ci * 100, 1), "%]"),
             showcase = bsicons::bs_icon("pie-chart"),
             theme    = "secondary"
           )
@@ -233,7 +231,7 @@ mod_frecuencias_server <- function(id, datos) {
       res <- comparacion()
 
       ggplot(res$resumen, aes(x = grupo, y = prop, ymin = lwr, ymax = upr,
-                               color = grupo)) +
+                              color = grupo)) +
         geom_pointrange(size = 0.9, linewidth = 1.2, fatten = 4) +
         scale_color_manual(values = c(colores$primario, colores$acento)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1),
@@ -260,9 +258,9 @@ mod_frecuencias_server <- function(id, datos) {
 
       df_dif <- tibble(
         etiqueta = paste0(res$grupo_a, " vs ", res$grupo_b),
-        dif      = res$ic_dif[, "est"],
-        lwr      = res$ic_dif[, "lwr.ci"],
-        upr      = res$ic_dif[, "upr.ci"]
+        dif      = res$ic_dif$est,
+        lwr      = res$ic_dif$lwr.ci,
+        upr      = res$ic_dif$upr.ci
       )
 
       ggplot(df_dif, aes(y = etiqueta, x = dif, xmin = lwr, xmax = upr)) +

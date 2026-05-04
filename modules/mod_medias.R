@@ -1,6 +1,6 @@
 # ============================================================
-# mod_comparar.R — Comparación de grupos
-#   · Medias e IC 95% con DescTools::MeanCI
+# mod_medias.R — Comparación de grupos
+#   · Medias e IC 95% con t.test() (R base)
 #   · Diferencia de medias absoluta y porcentual
 #   · Tamaño del efecto (Cohen's d) con effectsize
 #   · Gráfico geom_pointrange con puntos individuales
@@ -104,29 +104,40 @@ mod_medias_server <- function(id, datos) {
         need(length(x_b) >= 2, paste("El grupo", input$grupo_b, "tiene muy pocos datos."))
       )
 
-      # ── Medias e IC 95% con DescTools ──
-      ic_a <- DescTools::MeanCI(x_a, na.rm = TRUE)
-      ic_b <- DescTools::MeanCI(x_b, na.rm = TRUE)
+      # ── Medias e IC 95% con t.test() (R base) ──
+      tt_a <- t.test(x_a, conf.level = 0.95)
+      tt_b <- t.test(x_b, conf.level = 0.95)
 
-      media_a  <- ic_a[["mean"]]
-      media_b  <- ic_b[["mean"]]
-      dif_abs  <- media_a - media_b
-      dif_pct  <- if (media_b != 0) (dif_abs / abs(media_b)) * 100 else NA_real_
+      media_a <- tt_a$estimate
+      media_b <- tt_b$estimate
+      dif_abs <- media_a - media_b
+      dif_pct <- if (media_b != 0) (dif_abs / abs(media_b)) * 100 else NA_real_
+
+      # IC 95% de cada grupo
+      ic_a <- list(mean   = media_a,
+                   lwr.ci = tt_a$conf.int[1],
+                   upr.ci = tt_a$conf.int[2])
+      ic_b <- list(mean   = media_b,
+                   lwr.ci = tt_b$conf.int[1],
+                   upr.ci = tt_b$conf.int[2])
+
+      # ── IC 95% de la diferencia de medias con t.test() ──
+      tt_dif <- t.test(x_a, x_b, conf.level = 0.95)
+      ic_dif <- list(meandiff = tt_dif$estimate[1] - tt_dif$estimate[2],
+                     lwr.ci   = tt_dif$conf.int[1],
+                     upr.ci   = tt_dif$conf.int[2])
 
       # ── Cohen's d con effectsize ──
-      ef    <- cohens_d(x_a, x_b)
-      d_val <- round(ef$Cohens_d, 2)
+      ef     <- cohens_d(x_a, x_b)
+      d_val  <- round(ef$Cohens_d, 2)
       interp <- as.character(interpret_cohens_d(d_val, rules = "cohen1988"))
-
-      # ── IC 95% de la diferencia cruda de medias ──
-      ic_dif <- DescTools::MeanDiffCI(x_a, x_b)
 
       # ── Tabla de resumen por grupo para gráfico ──
       resumen <- tibble(
-        grupo  = c(input$grupo_a, input$grupo_b),
-        media  = c(media_a, media_b),
-        lwr    = c(ic_a[["lwr.ci"]], ic_b[["lwr.ci"]]),
-        upr    = c(ic_a[["upr.ci"]], ic_b[["upr.ci"]])
+        grupo = c(input$grupo_a, input$grupo_b),
+        media = c(media_a, media_b),
+        lwr   = c(ic_a$lwr.ci, ic_b$lwr.ci),
+        upr   = c(ic_a$upr.ci, ic_b$upr.ci)
       )
 
       list(
@@ -171,16 +182,16 @@ mod_medias_server <- function(id, datos) {
           value_box(
             title    = paste("Media —", res$grupo_a),
             value    = paste0(res$media_a,
-                              " [", round(res$ic_a[["lwr.ci"]], 2),
-                              " – ", round(res$ic_a[["upr.ci"]], 2), "]"),
+                              " [", round(res$ic_a$lwr.ci, 2),
+                              " – ", round(res$ic_a$upr.ci, 2), "]"),
             showcase = bsicons::bs_icon("bar-chart-fill"),
             theme    = "primary"
           ),
           value_box(
             title    = paste("Media —", res$grupo_b),
             value    = paste0(res$media_b,
-                              " [", round(res$ic_b[["lwr.ci"]], 2),
-                              " – ", round(res$ic_b[["upr.ci"]], 2), "]"),
+                              " [", round(res$ic_b$lwr.ci, 2),
+                              " – ", round(res$ic_b$upr.ci, 2), "]"),
             showcase = bsicons::bs_icon("bar-chart"),
             theme    = "secondary"
           )
@@ -216,7 +227,6 @@ mod_medias_server <- function(id, datos) {
 
       p <- ggplot()
 
-      # Puntos individuales — condicional al checkbox
       if (isTRUE(input$mostrar_puntos)) {
         p <- p + geom_jitter(
           data  = res$df_filt,
@@ -226,16 +236,12 @@ mod_medias_server <- function(id, datos) {
       }
 
       p +
-        # Media e IC 95%
         geom_pointrange(
           data = res$resumen,
-          aes(x = grupo, y = media, ymin = lwr, ymax = upr,
-              color = grupo),
+          aes(x = grupo, y = media, ymin = lwr, ymax = upr, color = grupo),
           size = 0.9, linewidth = 1.2, fatten = 4
         ) +
-        scale_color_manual(
-          values = c(colores$primario, colores$acento)
-        ) +
+        scale_color_manual(values = c(colores$primario, colores$acento)) +
         labs(
           title   = paste("Comparación de", res$variable),
           x       = input$grupo_comp,
@@ -255,25 +261,25 @@ mod_medias_server <- function(id, datos) {
         )
     }, bg = "transparent")
 
-    # ── Gráfico de efecto crudo (diferencia de medias + IC 95%) ──
+    # ── Gráfico de efecto crudo ──
     output$grafico_efecto <- renderPlot({
       res <- comparacion()
 
       df_ef <- tibble(
         etiqueta = paste0(res$grupo_a, " vs ", res$grupo_b),
-        dif      = res$ic_dif[["meandiff"]],
-        lwr      = res$ic_dif[["lwr.ci"]],
-        upr      = res$ic_dif[["upr.ci"]]
+        dif      = res$ic_dif$meandiff,
+        lwr      = res$ic_dif$lwr.ci,
+        upr      = res$ic_dif$upr.ci
       )
 
       ggplot(df_ef, aes(y = etiqueta, x = dif, xmin = lwr, xmax = upr)) +
         geom_vline(xintercept = 0, linetype = "dashed",
                    color = colores$texto, linewidth = 0.7) +
         geom_pointrange(
-          color    = colores$primario,
-          size     = 0.9,
+          color     = colores$primario,
+          size      = 0.9,
           linewidth = 1.2,
-          fatten   = 4
+          fatten    = 4
         ) +
         labs(
           title   = "Tamaño del efecto (diferencia cruda)",

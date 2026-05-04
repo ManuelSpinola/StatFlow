@@ -1,6 +1,6 @@
 Package: StatFlow
 Title: StatFlow - Análisis estadístico y visualización de datos
-Version: 2.0.0
+Version: 1.0.0
 Description: Aplicación Shiny modular para análisis estadístico y visualización de datos,
     orientada a usuarios sin experiencia en programación ni estadística.
     Parte de la suite Stat de herramientas educativas para ciencia de datos.

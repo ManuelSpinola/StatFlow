@@ -47,7 +47,7 @@ ui <- page_navbar(
   nav_panel("❓ Ayuda",                mod_ayuda_ui("ayuda")),
 
   nav_spacer(),
-  nav_item(tags$span(class = "text-muted small", "StatFlow v2.0"))
+  nav_item(tags$span(class = "text-muted small", "StatFlow v1.0"))
 )
 
 # ── 4. Server ──────────────────────────────────────────────

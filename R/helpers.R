@@ -11,13 +11,10 @@ library(performance)
 library(effectsize)
 library(bayestestR)
 library(datawizard)
-library(modelbased)
-library(report)
 library(insight)
 library(readxl)
 library(DT)
 library(scales)
-library(ggthemes)
 
 # ── Paleta de colores AnalizApp ────────────────────────────
 # Tableau Color Blind — accesible y profesional

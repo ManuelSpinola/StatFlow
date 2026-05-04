@@ -1,57 +1,50 @@
-# AnalizApp
+# StatFlow <img src="www/hexsticker_StatFlow.png" align="right" height="120"/>
 
-Herramienta de análisis y visualización de datos para usuarios sin experiencia en programación ni estadística.
-    Parte de la suite Stat de herramientas educativas para ciencia de datos.
-Versión 2.0 — arquitectura modular.
+> Herramienta interactiva de análisis estadístico y visualización de datos
+> para usuarios sin experiencia en programación ni estadística.
+
+Parte de la suite **StatSuite**:
+
+| App | Descripción | Estado |
+|-----|-------------|--------|
+| **StatFlow** | Primeros análisis y visualización de datos | ✅ Disponible |
+| [StatDesign](https://github.com/ManuelSpinola/StatDesign) | Diseño de estudios y muestreo | ✅ Disponible |
+| StatModels | Modelos estadísticos avanzados | 🔜 Próximamente |
 
 ## Estructura del proyecto
 
 ```
-statlab/
-├── app.R                  ← entrada: solo carga módulos y ensambla ui/server
-├── DESCRIPTION            ← dependencias para shinyapps.io
+StatFlow/
+├── app.R
+├── DESCRIPTION
 ├── R/
-│   └── helpers.R          ← tema visual, funciones compartidas, datos de ejemplo
+│   └── helpers.R
 └── modules/
-    ├── mod_datos.R        ← carga CSV/Excel, vista previa, reactive compartido
-    ├── mod_explorar.R     ← resumen descriptivo y frecuencias
-    ├── mod_graficos.R     ← histograma, boxplot, barras
-    ├── mod_comparar.R     ← diferencia de medias y tamaño de efecto
-    └── mod_ayuda.R        ← instrucciones y glosario
+    ├── mod_datos.R
+    ├── mod_explorar.R
+    ├── mod_graficos.R
+    ├── mod_medias.R
+    ├── mod_frecuencias.R
+    └── mod_ayuda.R
 ```
 
-## Instalar dependencias
+## Instalación local
 
 ```r
 install.packages(c(
-  "shiny", "bslib", "bsicons",
-  "tidyverse", "readxl",
-  "DT", "scales", "effectsize"
+  "shiny", "bslib", "bsicons", "tidyverse",
+  "readxl", "DT", "scales",
+  "parameters", "performance", "effectsize",
+  "bayestestR", "datawizard", "insight"
 ))
+shiny::runApp()
 ```
 
-## Correr localmente
+## Autor
 
-```r
-shiny::runApp("ruta/a/statlab/")
-```
+**Manuel Spínola**  
+ICOMVIS · Universidad Nacional · Costa Rica
 
-## Desplegar en shinyapps.io
+## Licencia
 
-```r
-install.packages("rsconnect")
-
-rsconnect::setAccountInfo(
-  name   = "TU_USUARIO",
-  token  = "TU_TOKEN",
-  secret = "TU_SECRET"
-)
-# Tokens: https://www.shinyapps.io/admin/#/tokens
-
-rsconnect::deployApp(
-  appDir  = "ruta/a/statlab/",
-  appName = "statlab"
-)
-```
-
-Después del despliegue, los usuarios acceden con un enlace — sin instalar R.
+MIT

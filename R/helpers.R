@@ -16,7 +16,7 @@ library(readxl)
 library(DT)
 library(scales)
 
-# ── Paleta de colores AnalizApp ────────────────────────────
+# ── Paleta de colores StatFlow ────────────────────────────
 # Tableau Color Blind — accesible y profesional
 colores <- list(
   fondo       = "#F4F7FB",  # azul muy pálido — fondo general

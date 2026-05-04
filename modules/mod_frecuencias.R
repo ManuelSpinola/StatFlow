@@ -132,8 +132,19 @@ mod_frecuencias_server <- function(id, datos) {
       )
 
       # ── IC 95% por grupo con prop.test() (R base) ──
-      pt_a <- prop.test(x_a, n_a, conf.level = 0.95, correct = FALSE)
-      pt_b <- prop.test(x_b, n_b, conf.level = 0.95, correct = FALSE)
+      warn_aprox <- FALSE
+
+      capturar <- function(expr) {
+        withCallingHandlers(expr, warning = function(w) {
+          if (grepl("Chi-squared approximation may be incorrect", conditionMessage(w))) {
+            warn_aprox <<- TRUE
+            invokeRestart("muffleWarning")
+          }
+        })
+      }
+
+      pt_a   <- capturar(prop.test(x_a, n_a, conf.level = 0.95, correct = FALSE))
+      pt_b   <- capturar(prop.test(x_b, n_b, conf.level = 0.95, correct = FALSE))
 
       prop_a <- pt_a$estimate
       prop_b <- pt_b$estimate
@@ -146,7 +157,7 @@ mod_frecuencias_server <- function(id, datos) {
                    upr.ci = pt_b$conf.int[2])
 
       # ── IC 95% diferencia de proporciones con prop.test() ──
-      pt_dif <- prop.test(c(x_a, x_b), c(n_a, n_b), conf.level = 0.95, correct = FALSE)
+      pt_dif <- capturar(prop.test(c(x_a, x_b), c(n_a, n_b), conf.level = 0.95, correct = FALSE))
       ic_dif <- list(est    = prop_a - prop_b,
                      lwr.ci = pt_dif$conf.int[1],
                      upr.ci = pt_dif$conf.int[2])
@@ -160,19 +171,20 @@ mod_frecuencias_server <- function(id, datos) {
       )
 
       list(
-        grupo_a   = input$grupo_a,
-        grupo_b   = input$grupo_b,
-        categoria = input$categoria,
-        variable  = input$var_resultado,
-        var_grupo = input$var_grupo,
+        grupo_a     = input$grupo_a,
+        grupo_b     = input$grupo_b,
+        categoria   = input$categoria,
+        variable    = input$var_resultado,
+        var_grupo   = input$var_grupo,
         x_a = x_a, n_a = n_a,
         x_b = x_b, n_b = n_b,
-        prop_a    = round(prop_a, 3),
-        prop_b    = round(prop_b, 3),
-        ic_a      = ic_a,
-        ic_b      = ic_b,
-        ic_dif    = ic_dif,
-        resumen   = resumen
+        prop_a      = round(prop_a, 3),
+        prop_b      = round(prop_b, 3),
+        ic_a        = ic_a,
+        ic_b        = ic_b,
+        ic_dif      = ic_dif,
+        resumen     = resumen,
+        warn_aprox  = warn_aprox
       )
     })
 
@@ -185,6 +197,14 @@ mod_frecuencias_server <- function(id, datos) {
       dif_pos     <- abs(round(res$prop_a - res$prop_b, 3))
 
       tagList(
+        if (res$warn_aprox)
+          div(
+            class = "alert alert-warning small mb-3",
+            icon("triangle-exclamation"), " ",
+            tags$strong("Muestra pequeña:"),
+            " alguno de los grupos tiene pocas observaciones, por lo que la aproximación
+              chi-cuadrado puede ser imprecisa. Interpretá los intervalos con cautela."
+          ),
         layout_columns(
           col_widths = c(6, 6),
           value_box(

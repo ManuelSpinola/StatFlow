@@ -1,10 +1,12 @@
-name: StatFlow
-title:
+name: statflow
+title: StatFlow
 username: manuelspinola
 account: manuelspinola
 server: connect.posit.cloud
 hostUrl: https://api.connect.posit.cloud/v1
-appId: 019df2ca-861d-fd69-8acf-a0934c1cd4ae
+appId: 019df381-69b8-04d5-06f8-e47d24bf1890
 bundleId:
-url: https://connect.posit.cloud/manuelspinola/content/019df2ca-861d-fd69-8acf-a0934c1cd4ae
+url: https://connect.posit.cloud/manuelspinola/content/019df381-69b8-04d5-06f8-e47d24bf1890
 version: 1
+asMultiple: FALSE
+asStatic: FALSE

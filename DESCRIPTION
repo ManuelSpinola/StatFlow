@@ -21,11 +21,8 @@ Imports:
     effectsize,
     bayestestR,
     datawizard,
-    modelbased,
     insight,
-    report,
     readxl,
     DT,
     scales,
-    DescTools
 License: MIT

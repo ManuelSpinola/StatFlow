@@ -135,7 +135,7 @@ mod_explorar_server <- function(id, datos) {
         Valor = c(
           round(mean(x, na.rm = TRUE), 3),
           round(median(x, na.rm = TRUE), 3),
-          round(as.numeric(DescTools::Mode(x, na.rm = TRUE)[1]), 3)
+          round(as.numeric(names(sort(table(x[!is.na(x)]), decreasing = TRUE))[1]), 3)
         )
       )
     }, striped = TRUE, hover = TRUE, bordered = TRUE)

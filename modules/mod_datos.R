@@ -75,7 +75,7 @@ mod_datos_ui <- function(id) {
                   card_body(
                     tags$span(
                       class = "badge mb-2",
-                      style = paste0("background-color:", colores$advertencia, "; color:#633806;"),
+                      style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
                       "Categórica"
                     ),
                     p("Representa grupos o etiquetas.", class = "small mb-2"),
@@ -128,7 +128,7 @@ mod_datos_server <- function(id) {
           estilo <- if (tipo == "Numérica")
             paste0("background-color:", colores$primario, "; color:#ffffff;")
           else
-            paste0("background-color:", colores$advertencia, "; color:#633806;")
+            paste0("background-color:", colores$acento, "; color:#ffffff;")
           tags$span(
             class = "badge",
             style = estilo,

@@ -154,3 +154,19 @@ datos_ejemplo <- list(
     anio           = sample(2020:2024, 48, replace = TRUE)
   )
 )
+
+# ── Código R reproducible: encabezado estándar ────────────
+# Usada por todos los módulos de StatSuite que generan código R.
+# Parámetros:
+#   app    — "StatDesign", "StatFlow", "StatGeo", "StatMonitor"
+#   modulo — nombre del módulo, p.ej. "Explorar", "Comparar medias"
+encabezado_script <- function(app, modulo) {
+  paste0(
+    "# ============================================\n",
+    "# ", app, " · StatSuite\n",
+    "# Módulo: ", modulo, "\n",
+    "# Generado: ", format(Sys.Date(), "%Y-%m-%d"), "\n",
+    "# Manuel Spínola · ICOMVIS · UNA · Costa Rica\n",
+    "# ============================================\n\n"
+  )
+}

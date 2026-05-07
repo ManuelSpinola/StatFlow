@@ -51,7 +51,25 @@ mod_medias_ui <- function(id) {
             plotOutput(ns("grafico_efecto"),      height = "360px")
           ),
           br(),
-          uiOutput(ns("nota_grafico"))
+          uiOutput(ns("nota_grafico")),
+          hr(),
+          card(
+            card_header(
+              class = "d-flex justify-content-between align-items-center",
+              tagList(bs_icon("code-slash"), " Código R reproducible"),
+              downloadButton(
+                ns("descargar_script"),
+                label = "Descargar .R",
+                icon  = bs_icon("download"),
+                class = "btn-sm btn-outline-primary"
+              )
+            ),
+            p(
+              "Script que reproduce esta comparación de medias con tus datos.",
+              class = "text-muted small px-3 pt-2 mb-1"
+            ),
+            verbatimTextOutput(ns("codigo_r"))
+          )
         )
       )
     )
@@ -315,6 +333,43 @@ mod_medias_server <- function(id, datos) {
         )
       )
     })
+
+    # ── Código R reproducible ─────────────────────────────
+    codigo_generado <- eventReactive(input$calcular, {
+      req(datos(), input$var_comp, input$grupo_comp, input$grupo_a, input$grupo_b)
+
+      var   <- input$var_comp
+      grupo <- input$grupo_comp
+      ga    <- input$grupo_a
+      gb    <- input$grupo_b
+
+      encabezado <- encabezado_script("StatFlow", "Comparar medias")
+
+      paste0(
+        encabezado,
+        "library(tidyverse)\n",
+        "library(effectsize)\n\n",
+        "# Cargá tus datos\n",
+        "datos <- read.csv(\"tu_archivo.csv\")\n\n",
+        "# Filtrar los dos grupos\n",
+        "x_", make.names(ga), " <- datos$`", var, "`[datos$`", grupo, "` == \"", ga, "\"]\n",
+        "x_", make.names(gb), " <- datos$`", var, "`[datos$`", grupo, "` == \"", gb, "\"]\n\n",
+        "# Medias con IC 95% por grupo\n",
+        "t.test(x_", make.names(ga), ", conf.level = 0.95)\n",
+        "t.test(x_", make.names(gb), ", conf.level = 0.95)\n\n",
+        "# IC 95% de la diferencia de medias\n",
+        "t.test(x_", make.names(ga), ", x_", make.names(gb), ", conf.level = 0.95)\n\n",
+        "# Tamaño del efecto (d de Cohen)\n",
+        "cohens_d(x_", make.names(ga), ", x_", make.names(gb), ")\n"
+      )
+    })
+
+    output$codigo_r <- renderText({ codigo_generado() })
+
+    output$descargar_script <- downloadHandler(
+      filename = function() paste0("medias_", format(Sys.Date(), "%Y%m%d"), ".R"),
+      content  = function(file) writeLines(codigo_generado(), file)
+    )
 
   })
 }

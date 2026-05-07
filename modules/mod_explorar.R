@@ -76,6 +76,27 @@ mod_explorar_ui <- function(id) {
 
             h6("🔎 Resumen"),
             tableOutput(ns("tabla_cat_resumen"))
+          ),
+
+          hr(),
+
+          # ── Código R reproducible ──
+          card(
+            card_header(
+              class = "d-flex justify-content-between align-items-center",
+              tagList(bs_icon("code-slash"), " Código R reproducible"),
+              downloadButton(
+                ns("descargar_script"),
+                label = "Descargar .R",
+                icon  = bs_icon("download"),
+                class = "btn-sm btn-outline-primary"
+              )
+            ),
+            p(
+              "Script que reproduce este análisis descriptivo con tus datos.",
+              class = "text-muted small px-3 pt-2 mb-1"
+            ),
+            verbatimTextOutput(ns("codigo_r"))
           )
         )
       )
@@ -255,6 +276,70 @@ mod_explorar_server <- function(id, datos) {
         )
       )
     }, striped = TRUE, hover = TRUE, bordered = TRUE)
+
+    # ── Código R reproducible ─────────────────────────────
+    codigo_generado <- reactive({
+      req(datos(), input$variable)
+      var  <- input$variable
+      tipo <- tipo_actual()
+
+      encabezado <- encabezado_script("StatFlow", "Explorar — EDA numérico")
+
+      carga <- paste0(
+        "# Cargá tus datos\n",
+        "library(tidyverse)\n",
+        "datos <- read.csv(\"tu_archivo.csv\")\n\n",
+        "# Variable analizada\n",
+        "x <- datos$`", var, "`\n\n"
+      )
+
+      cuerpo <- if (tipo == "Numérica") {
+        paste0(
+          "# ── Tendencia central ──\n",
+          "mean(x, na.rm = TRUE)    # Media\n",
+          "median(x, na.rm = TRUE)  # Mediana\n\n",
+          "# ── Dispersión ──\n",
+          "sd(x, na.rm = TRUE)      # Desviación estándar\n",
+          "var(x, na.rm = TRUE)     # Varianza\n",
+          "IQR(x, na.rm = TRUE)     # Rango intercuartílico\n",
+          "sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE) * 100  # CV (%)\n\n",
+          "# ── Forma ──\n",
+          "library(datawizard)\n",
+          "skewness(x)$Skewness  # Asimetría\n",
+          "kurtosis(x)$Kurtosis  # Curtosis\n\n",
+          "# ── Valores extremos ──\n",
+          "quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)  # Q1 y Q3\n",
+          "min(x, na.rm = TRUE)\n",
+          "max(x, na.rm = TRUE)\n\n",
+          "# ── Valores perdidos ──\n",
+          "sum(is.na(x))   # NAs\n",
+          "sum(!is.na(x))  # Válidos\n\n",
+          "# ── Resumen completo ──\n",
+          "summary(x)\n"
+        )
+      } else {
+        paste0(
+          "# ── Tabla de frecuencias ──\n",
+          "tabla <- as.data.frame(table(x))\n",
+          "tabla$Porcentaje <- round(tabla$Freq / sum(tabla$Freq) * 100, 1)\n",
+          "tabla[order(-tabla$Freq), ]\n\n",
+          "# ── Con tidyverse ──\n",
+          "datos |>\n",
+          "  count(`", var, "`) |>\n",
+          "  mutate(pct = round(n / sum(n) * 100, 1)) |>\n",
+          "  arrange(desc(n))\n"
+        )
+      }
+
+      paste0(encabezado, carga, cuerpo)
+    })
+
+    output$codigo_r <- renderText({ codigo_generado() })
+
+    output$descargar_script <- downloadHandler(
+      filename = function() paste0("explorar_", format(Sys.Date(), "%Y%m%d"), ".R"),
+      content  = function(file) writeLines(codigo_generado(), file)
+    )
 
   })
 }

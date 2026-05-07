@@ -51,7 +51,25 @@ mod_frecuencias_ui <- function(id) {
             plotOutput(ns("grafico_diferencia"),   height = "360px")
           ),
           br(),
-          uiOutput(ns("nota_grafico"))
+          uiOutput(ns("nota_grafico")),
+          hr(),
+          card(
+            card_header(
+              class = "d-flex justify-content-between align-items-center",
+              tagList(bs_icon("code-slash"), " Código R reproducible"),
+              downloadButton(
+                ns("descargar_script"),
+                label = "Descargar .R",
+                icon  = bs_icon("download"),
+                class = "btn-sm btn-outline-primary"
+              )
+            ),
+            p(
+              "Script que reproduce esta comparación de proporciones con tus datos.",
+              class = "text-muted small px-3 pt-2 mb-1"
+            ),
+            verbatimTextOutput(ns("codigo_r"))
+          )
         )
       )
     )
@@ -325,6 +343,51 @@ mod_frecuencias_server <- function(id, datos) {
         )
       )
     })
+
+    # ── Código R reproducible ─────────────────────────────
+    codigo_generado <- eventReactive(input$calcular, {
+      req(datos(), input$var_resultado, input$categoria,
+          input$var_grupo, input$grupo_a, input$grupo_b)
+
+      var_res <- input$var_resultado
+      cat_int <- input$categoria
+      var_grp <- input$var_grupo
+      ga      <- input$grupo_a
+      gb      <- input$grupo_b
+
+      encabezado <- encabezado_script("StatFlow", "Comparar frecuencias")
+
+      paste0(
+        encabezado,
+        "library(tidyverse)\n\n",
+        "# Cargá tus datos\n",
+        "datos <- read.csv(\"tu_archivo.csv\")\n\n",
+        "# Filtrar los dos grupos\n",
+        "df <- datos |>\n",
+        "  filter(`", var_grp, "` %in% c(\"", ga, "\", \"", gb, "\"))\n\n",
+        "# Conteos por grupo\n",
+        "x_", make.names(ga), " <- sum(df$`", var_res, "`[df$`", var_grp, "` == \"", ga, "\"] == \"", cat_int, "\")\n",
+        "n_", make.names(ga), " <- sum(df$`", var_grp, "` == \"", ga, "\")\n",
+        "x_", make.names(gb), " <- sum(df$`", var_res, "`[df$`", var_grp, "` == \"", gb, "\"] == \"", cat_int, "\")\n",
+        "n_", make.names(gb), " <- sum(df$`", var_grp, "` == \"", gb, "\")\n\n",
+        "# IC 95% por grupo (proporción de '", cat_int, "')\n",
+        "prop.test(x_", make.names(ga), ", n_", make.names(ga), ", conf.level = 0.95, correct = FALSE)\n",
+        "prop.test(x_", make.names(gb), ", n_", make.names(gb), ", conf.level = 0.95, correct = FALSE)\n\n",
+        "# IC 95% de la diferencia de proporciones\n",
+        "prop.test(\n",
+        "  c(x_", make.names(ga), ", x_", make.names(gb), "),\n",
+        "  c(n_", make.names(ga), ", n_", make.names(gb), "),\n",
+        "  conf.level = 0.95, correct = FALSE\n",
+        ")\n"
+      )
+    })
+
+    output$codigo_r <- renderText({ codigo_generado() })
+
+    output$descargar_script <- downloadHandler(
+      filename = function() paste0("frecuencias_", format(Sys.Date(), "%Y%m%d"), ".R"),
+      content  = function(file) writeLines(codigo_generado(), file)
+    )
 
   })
 }

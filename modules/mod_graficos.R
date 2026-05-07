@@ -84,7 +84,25 @@ mod_graficos_ui <- function(id) {
         card_body(
           plotOutput(ns("grafico_principal"), height = "420px"),
           hr(),
-          uiOutput(ns("nota_grafico"))
+          uiOutput(ns("nota_grafico")),
+          hr(),
+          card(
+            card_header(
+              class = "d-flex justify-content-between align-items-center",
+              tagList(bs_icon("code-slash"), " Código R reproducible"),
+              downloadButton(
+                ns("descargar_script"),
+                label = "Descargar .R",
+                icon  = bs_icon("download"),
+                class = "btn-sm btn-outline-primary"
+              )
+            ),
+            p(
+              "Script que reproduce este gráfico con tus datos.",
+              class = "text-muted small px-3 pt-2 mb-1"
+            ),
+            verbatimTextOutput(ns("codigo_r"))
+          )
         )
       )
     )
@@ -304,6 +322,124 @@ mod_graficos_server <- function(id, datos) {
         tags$p(tags$strong("⚠️ Limitación: "), nota$desventaja, class = "mb-0")
       )
     })
+
+    # ── Código R reproducible ─────────────────────────────
+    codigo_generado <- reactive({
+      req(datos(), input$tipo_grafico, input$var_graf)
+      tipo  <- input$tipo_grafico
+      var_x <- input$var_graf
+      color <- color_activo()
+      tit   <- titulo_activo()
+      grupo <- input$grupo_graf
+
+      encabezado <- encabezado_script("StatFlow", "Gráficos")
+
+      carga <- paste0(
+        "library(tidyverse)\n\n",
+        "# Cargá tus datos\n",
+        "datos <- read.csv(\"tu_archivo.csv\")\n\n"
+      )
+
+      geom <- if (tipo == "histograma") {
+        bins <- if (!is.null(input$n_bins)) input$n_bins else "nclass.Sturges(datos$`var`)"
+        paste0(
+          "ggplot(datos, aes(x = `", var_x, "`)) +\n",
+          "  geom_histogram(fill = \"", color, "\", color = \"white\",\n",
+          "                 bins = ", bins, ", alpha = 0.85) +\n",
+          "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Frecuencia\") +\n",
+          "  theme_minimal()\n"
+        )
+      } else if (tipo == "densidad") {
+        paste0(
+          "ggplot(datos, aes(x = `", var_x, "`)) +\n",
+          "  geom_density(fill = \"", color, "\", alpha = 0.6) +\n",
+          "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Densidad\") +\n",
+          "  theme_minimal()\n"
+        )
+      } else if (tipo == "boxplot") {
+        if (!is.null(grupo) && grupo != "ninguno") {
+          paste0(
+            "ggplot(datos, aes(x = `", grupo, "`, y = `", var_x, "`,\n",
+            "                  fill = `", grupo, "`)) +\n",
+            "  geom_boxplot(alpha = 0.7, outlier.shape = 21) +\n",
+            "  geom_jitter(width = 0.15, alpha = 0.4, size = 1.5) +\n",
+            "  scale_fill_brewer(palette = \"Set2\") +\n",
+            "  labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
+            "  theme_minimal() + theme(legend.position = \"none\")\n"
+          )
+        } else {
+          paste0(
+            "ggplot(datos, aes(x = \"\", y = `", var_x, "`)) +\n",
+            "  geom_boxplot(fill = \"", color, "\", alpha = 0.7, width = 0.4) +\n",
+            "  labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
+            "  theme_minimal()\n"
+          )
+        }
+      } else if (tipo == "violin") {
+        if (!is.null(grupo) && grupo != "ninguno") {
+          paste0(
+            "ggplot(datos, aes(x = `", grupo, "`, y = `", var_x, "`,\n",
+            "                  fill = `", grupo, "`)) +\n",
+            "  geom_violin(alpha = 0.6) +\n",
+            "  geom_jitter(width = 0.1, alpha = 0.5, size = 1.8) +\n",
+            "  scale_fill_brewer(palette = \"Set2\") +\n",
+            "  labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
+            "  theme_minimal() + theme(legend.position = \"none\")\n"
+          )
+        } else {
+          paste0(
+            "ggplot(datos, aes(x = \"\", y = `", var_x, "`)) +\n",
+            "  geom_violin(fill = \"", color, "\", alpha = 0.6) +\n",
+            "  geom_jitter(width = 0.08, alpha = 0.6, size = 1.8) +\n",
+            "  labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
+            "  theme_minimal()\n"
+          )
+        }
+      } else if (tipo == "barras") {
+        paste0(
+          "datos |>\n",
+          "  count(`", var_x, "`) |>\n",
+          "  ggplot(aes(x = reorder(`", var_x, "`, n), y = n)) +\n",
+          "  geom_col(fill = \"", color, "\", alpha = 0.85) +\n",
+          "  coord_flip() +\n",
+          "  labs(title = \"", tit, "\", x = NULL, y = \"Frecuencia\") +\n",
+          "  theme_minimal()\n"
+        )
+      } else if (tipo == "dispersion") {
+        req(input$var_y)
+        var_y <- input$var_y
+        if (!is.null(grupo) && grupo != "ninguno") {
+          paste0(
+            "ggplot(datos, aes(x = `", var_x, "`, y = `", var_y, "`,\n",
+            "                  color = `", grupo, "`)) +\n",
+            "  geom_point(alpha = 0.7, size = 2.5) +\n",
+            "  geom_smooth(method = \"lm\", se = FALSE, linewidth = 0.8) +\n",
+            "  scale_color_brewer(palette = \"Set2\") +\n",
+            "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
+            "  theme_minimal()\n"
+          )
+        } else {
+          paste0(
+            "ggplot(datos, aes(x = `", var_x, "`, y = `", var_y, "`)) +\n",
+            "  geom_point(color = \"", color, "\", alpha = 0.7, size = 2.5) +\n",
+            "  geom_smooth(method = \"lm\", se = TRUE, linewidth = 0.8) +\n",
+            "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
+            "  theme_minimal()\n"
+          )
+        }
+      } else {
+        "# Seleccioná un tipo de gráfico para ver el código\n"
+      }
+
+      paste0(encabezado, carga, geom)
+    })
+
+    output$codigo_r <- renderText({ codigo_generado() })
+
+    output$descargar_script <- downloadHandler(
+      filename = function() paste0("grafico_", format(Sys.Date(), "%Y%m%d"), ".R"),
+      content  = function(file) writeLines(codigo_generado(), file)
+    )
 
   })
 }

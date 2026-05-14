@@ -67,8 +67,8 @@ tema_app <- bs_theme(
   .navbar .nav-link.active { border-bottom: 2px solid #FC7D0B; }
   .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
   .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
-  .card-header { background-color: #EEF3FA; font-weight: 700;
-                 border-bottom: 2px solid #C8D9EC; }
+  .card > .card-header { background-color: #C8D9EC; color: #1170AA; font-weight: 700;
+                         border-bottom: none; }
 ")
 
 # ── Escala de color para gráficos (ggplot2) ───────────────

@@ -41,41 +41,76 @@ mod_explorar_ui <- function(id) {
           conditionalPanel(
             condition = sprintf("output['%s'] == 'Numérica'", ns("tipo_var")),
 
-            h6("📍 Tendencia central"),
-            p("Indican dónde se concentran los datos.", class = "text-muted small"),
-            tableOutput(ns("tabla_central")),
-            hr(),
+            layout_columns(
+              col_widths = c(6, 6),
+              gap = "1rem",
 
-            h6("📏 Dispersión"),
-            p("Indican qué tan dispersos o concentrados están los datos.", class = "text-muted small"),
-            tableOutput(ns("tabla_dispersion")),
-            hr(),
+              # Fila 1
+              card(
+                card_header("📍 Tendencia central"),
+                card_body(
+                  p("Indican dónde se concentran los datos.", class = "text-muted small"),
+                  tableOutput(ns("tabla_central"))
+                )
+              ),
+              card(
+                card_header("📏 Dispersión"),
+                card_body(
+                  p("Indican qué tan dispersos o concentrados están los datos.", class = "text-muted small"),
+                  tableOutput(ns("tabla_dispersion"))
+                )
+              ),
 
-            h6("📐 Forma de la distribución"),
-            p("Describen la simetría y el peso de las colas.", class = "text-muted small"),
-            tableOutput(ns("tabla_forma")),
-            hr(),
+              # Fila 2
+              card(
+                card_header("📐 Forma de la distribución"),
+                card_body(
+                  p("Describen la simetría y el peso de las colas.", class = "text-muted small"),
+                  tableOutput(ns("tabla_forma"))
+                )
+              ),
+              card(
+                card_header("🔎 Valores extremos"),
+                card_body(
+                  p("Mínimo, máximo y posibles valores atípicos (outliers).", class = "text-muted small"),
+                  tableOutput(ns("tabla_extremos"))
+                )
+              ),
 
-            h6("🔎 Valores extremos"),
-            p("Mínimo, máximo y posibles valores atípicos (outliers).", class = "text-muted small"),
-            tableOutput(ns("tabla_extremos")),
-            hr(),
-
-            h6("❓ Valores perdidos"),
-            tableOutput(ns("tabla_na"))
+              # Fila 3 — valores perdidos ocupa ambas columnas
+              card(
+                col_width = 12,
+                card_header("❓ Valores perdidos"),
+                card_body(
+                  tableOutput(ns("tabla_na"))
+                )
+              )
+            )
           ),
 
           # ── Categórica ──
           conditionalPanel(
             condition = sprintf("output['%s'] == 'Categórica'", ns("tipo_var")),
 
-            h6("📊 Tabla de frecuencias"),
-            p("Muestra cuántas veces aparece cada categoría y su proporción.", class = "text-muted small"),
-            tableOutput(ns("tabla_frecuencias")),
-            hr(),
+            layout_columns(
+              col_widths = c(6, 6),
+              gap = "1rem",
 
-            h6("🔎 Resumen"),
-            tableOutput(ns("tabla_cat_resumen"))
+              card(
+                card_header("📊 Tabla de frecuencias"),
+                card_body(
+                  p("Muestra cuántas veces aparece cada categoría y su proporción.", class = "text-muted small"),
+                  tableOutput(ns("tabla_frecuencias"))
+                )
+              ),
+
+              card(
+                card_header("🔎 Resumen"),
+                card_body(
+                  tableOutput(ns("tabla_cat_resumen"))
+                )
+              )
+            )
           ),
 
           hr(),

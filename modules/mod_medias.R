@@ -14,7 +14,7 @@ mod_medias_ui <- function(id) {
 
       # ── Controles ──
       card(
-        card_header("⚖️ Opciones"),
+        card_header(tagList(bs_icon("bar-chart"), " Opciones")),
         card_body(
           uiOutput(ns("sel_variable_comp")),
           uiOutput(ns("sel_grupo_comp")),
@@ -44,31 +44,29 @@ mod_medias_ui <- function(id) {
         card_header("Resultados de la comparación"),
         card_body(
           uiOutput(ns("resultado_texto")),
-          hr(),
           layout_columns(
             col_widths = c(6, 6),
-            plotOutput(ns("grafico_comparacion"), height = "360px"),
-            plotOutput(ns("grafico_efecto"),      height = "360px")
+            plotOutput(ns("grafico_comparacion"), height = "480px"),
+            plotOutput(ns("grafico_efecto"),      height = "480px")
           ),
-          br(),
           uiOutput(ns("nota_grafico")),
-          hr(),
-          card(
-            card_header(
-              class = "d-flex justify-content-between align-items-center",
-              tagList(bs_icon("code-slash"), " Código R reproducible"),
+          accordion(
+            open = FALSE,
+            accordion_panel(
+              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              value = "panel_codigo",
+              p(
+                "Script que reproduce esta comparación de medias con tus datos.",
+                class = "text-muted small mb-2"
+              ),
+              verbatimTextOutput(ns("codigo_r")),
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
                 icon  = bs_icon("download"),
-                class = "btn-sm btn-outline-primary"
+                class = "btn-sm btn-outline-primary mt-2"
               )
-            ),
-            p(
-              "Script que reproduce esta comparación de medias con tus datos.",
-              class = "text-muted small px-3 pt-2 mb-1"
-            ),
-            verbatimTextOutput(ns("codigo_r"))
+            )
           )
         )
       )
@@ -223,6 +221,13 @@ mod_medias_server <- function(id, datos) {
               tags$strong(grupo_menor), " en ",
               tags$strong(dif_abs_pos, " unidades"),
               sprintf(" (%.1f%% más).", dif_pct_pos)
+            ),
+            tags$p(
+              "El intervalo de confianza al 95% de esta diferencia es ",
+              tags$strong(sprintf("[%.2f – %.2f]",
+                                  round(res$ic_dif$lwr.ci, 2),
+                                  round(res$ic_dif$upr.ci, 2))),
+              " — rango de valores plausibles para la diferencia real entre los dos grupos."
             ),
             tags$p(
               "El tamaño de esta diferencia es ",

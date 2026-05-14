@@ -13,7 +13,7 @@ mod_frecuencias_ui <- function(id) {
 
       # ── Controles ──
       card(
-        card_header("📊 Opciones"),
+        card_header(tagList(bs_icon("pie-chart"), " Opciones")),
         card_body(
           uiOutput(ns("sel_var_resultado")),
           uiOutput(ns("sel_categoria")),
@@ -44,31 +44,29 @@ mod_frecuencias_ui <- function(id) {
         card_header("Resultados de la comparación"),
         card_body(
           uiOutput(ns("resultado_texto")),
-          hr(),
           layout_columns(
             col_widths = c(6, 6),
-            plotOutput(ns("grafico_proporciones"), height = "360px"),
-            plotOutput(ns("grafico_diferencia"),   height = "360px")
+            plotOutput(ns("grafico_proporciones"), height = "340px"),
+            plotOutput(ns("grafico_diferencia"),   height = "340px")
           ),
-          br(),
           uiOutput(ns("nota_grafico")),
-          hr(),
-          card(
-            card_header(
-              class = "d-flex justify-content-between align-items-center",
-              tagList(bs_icon("code-slash"), " Código R reproducible"),
+          accordion(
+            open = FALSE,
+            accordion_panel(
+              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              value = "panel_codigo",
+              p(
+                "Script que reproduce esta comparación de proporciones con tus datos.",
+                class = "text-muted small mb-2"
+              ),
+              verbatimTextOutput(ns("codigo_r")),
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
                 icon  = bs_icon("download"),
-                class = "btn-sm btn-outline-primary"
+                class = "btn-sm btn-outline-primary mt-2"
               )
-            ),
-            p(
-              "Script que reproduce esta comparación de proporciones con tus datos.",
-              class = "text-muted small px-3 pt-2 mb-1"
-            ),
-            verbatimTextOutput(ns("codigo_r"))
+            )
           )
         )
       )
@@ -254,6 +252,13 @@ mod_frecuencias_server <- function(id, datos) {
               tags$strong(grupo_menor), ".",
               sprintf(" La diferencia de proporciones es %.1f puntos porcentuales.",
                       dif_pos * 100)
+            ),
+            tags$p(
+              "El intervalo de confianza al 95% de esta diferencia es ",
+              tags$strong(sprintf("[%.1f%% – %.1f%%]",
+                                  round(res$ic_dif$lwr.ci * 100, 1),
+                                  round(res$ic_dif$upr.ci * 100, 1))),
+              " — rango de valores plausibles para la diferencia real entre los dos grupos."
             ),
             tags$p(
               class = "text-muted small",

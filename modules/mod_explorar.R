@@ -10,7 +10,7 @@ mod_explorar_ui <- function(id) {
 
       # ── Controles ──
       card(
-        card_header("🔍 Opciones"),
+        card_header(tagList(bs_icon("search"), " Opciones")),
         card_body(
           uiOutput(ns("sel_variable")),
           hr(),
@@ -47,14 +47,14 @@ mod_explorar_ui <- function(id) {
 
               # Fila 1
               card(
-                card_header("📍 Tendencia central"),
+                card_header(tagList(bs_icon("bullseye"), " Tendencia central")),
                 card_body(
                   p("Indican dónde se concentran los datos.", class = "text-muted small"),
                   tableOutput(ns("tabla_central"))
                 )
               ),
               card(
-                card_header("📏 Dispersión"),
+                card_header(tagList(bs_icon("arrows-expand"), " Dispersión")),
                 card_body(
                   p("Indican qué tan dispersos o concentrados están los datos.", class = "text-muted small"),
                   tableOutput(ns("tabla_dispersion"))
@@ -63,14 +63,14 @@ mod_explorar_ui <- function(id) {
 
               # Fila 2
               card(
-                card_header("📐 Forma de la distribución"),
+                card_header(tagList(bs_icon("activity"), " Forma de la distribución")),
                 card_body(
                   p("Describen la simetría y el peso de las colas.", class = "text-muted small"),
                   tableOutput(ns("tabla_forma"))
                 )
               ),
               card(
-                card_header("🔎 Valores extremos"),
+                card_header(tagList(bs_icon("exclamation-triangle"), " Valores extremos")),
                 card_body(
                   p("Mínimo, máximo y posibles valores atípicos (outliers).", class = "text-muted small"),
                   tableOutput(ns("tabla_extremos"))
@@ -80,7 +80,7 @@ mod_explorar_ui <- function(id) {
               # Fila 3 — valores perdidos ocupa ambas columnas
               card(
                 col_width = 12,
-                card_header("❓ Valores perdidos"),
+                card_header(tagList(bs_icon("question-circle"), " Valores perdidos")),
                 card_body(
                   tableOutput(ns("tabla_na"))
                 )
@@ -97,7 +97,7 @@ mod_explorar_ui <- function(id) {
               gap = "1rem",
 
               card(
-                card_header("📊 Tabla de frecuencias"),
+                card_header(tagList(bs_icon("bar-chart"), " Tabla de frecuencias")),
                 card_body(
                   p("Muestra cuántas veces aparece cada categoría y su proporción.", class = "text-muted small"),
                   tableOutput(ns("tabla_frecuencias"))
@@ -105,7 +105,7 @@ mod_explorar_ui <- function(id) {
               ),
 
               card(
-                card_header("🔎 Resumen"),
+                card_header(tagList(bs_icon("list-ul"), " Resumen")),
                 card_body(
                   tableOutput(ns("tabla_cat_resumen"))
                 )
@@ -116,22 +116,23 @@ mod_explorar_ui <- function(id) {
           hr(),
 
           # ── Código R reproducible ──
-          card(
-            card_header(
-              class = "d-flex justify-content-between align-items-center",
-              tagList(bs_icon("code-slash"), " Código R reproducible"),
+          accordion(
+            open = FALSE,
+            accordion_panel(
+              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              value = "codigo_r",
+              p(
+                "Script que reproduce este análisis descriptivo con tus datos.",
+                class = "text-muted small mb-2"
+              ),
+              verbatimTextOutput(ns("codigo_r")),
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
                 icon  = bs_icon("download"),
-                class = "btn-sm btn-outline-primary"
+                class = "btn-sm btn-outline-primary mt-2"
               )
-            ),
-            p(
-              "Script que reproduce este análisis descriptivo con tus datos.",
-              class = "text-muted small px-3 pt-2 mb-1"
-            ),
-            verbatimTextOutput(ns("codigo_r"))
+            )
           )
         )
       )

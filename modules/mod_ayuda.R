@@ -9,7 +9,7 @@ mod_ayuda_ui <- function(id) {
       col_widths = c(6, 6),
 
       card(
-        card_header("❓ ¿Cómo usar esta herramienta?"),
+        card_header(tagList(bs_icon("question-circle"), " ¿Cómo usar esta herramienta?")),
         card_body(
           tags$ol(
             class = "ps-3",
@@ -30,13 +30,13 @@ mod_ayuda_ui <- function(id) {
           ),
           hr(),
           tags$p(class = "text-muted small",
-            "Si tu archivo no carga, verifica que la primera fila tenga los nombres",
-            " de las columnas (encabezados) y que los datos empiecen en la segunda fila.")
+                 "Si tu archivo no carga, verifica que la primera fila tenga los nombres",
+                 " de las columnas (encabezados) y que los datos empiecen en la segunda fila.")
         )
       ),
 
       card(
-        card_header("📖 Glosario básico"),
+        card_header(tagList(bs_icon("book"), " Glosario básico")),
         card_body(
           tags$dl(
             tags$dt("Promedio (media)"),

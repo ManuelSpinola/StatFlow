@@ -10,7 +10,7 @@ mod_datos_ui <- function(id) {
 
       # ── Panel izquierdo: controles ──
       card(
-        card_header("📂 Cargar datos"),
+        card_header(tagList(bs_icon("folder2-open"), " Cargar datos")),
         card_body(
           p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
             class = "text-muted small"),

@@ -6,12 +6,14 @@
 colourInput_simple <- function(inputId, label, value = "#1D9E75") {
   tags$div(
     class = "mb-3",
-    tags$label(label, class = "form-label"),
+    tags$label(label, `for` = inputId, class = "form-label"),
     tags$input(
       type  = "color",
       id    = inputId,
+      name  = inputId,
       value = value,
-      class = "form-control form-control-color"
+      class = "form-control form-control-color shiny-bound-input",
+      onchange = sprintf("Shiny.setInputValue('%s', this.value)", inputId)
     )
   )
 }
@@ -53,7 +55,7 @@ mod_graficos_ui <- function(id) {
 
       # ── Controles ──
       card(
-        card_header("📊 Opciones del gráfico"),
+        card_header(tagList(bs_icon("graph-up"), " Opciones del gráfico")),
         card_body(
           uiOutput(ns("sel_tipo")),
           hr(),
@@ -63,7 +65,10 @@ mod_graficos_ui <- function(id) {
           uiOutput(ns("slider_bins")),
           hr(),
           textInput(ns("titulo"), "Título (opcional)", placeholder = "Mi gráfico"),
+          uiOutput(ns("input_eje_x")),
+          uiOutput(ns("input_eje_y")),
           colourInput_simple(ns("color_principal"), "Color principal", value = "#1D9E75"),
+          p("Se aplica cuando no hay grupo seleccionado.", class = "text-muted small mt-1"),
           hr(),
           accordion(
             open = FALSE,
@@ -78,31 +83,46 @@ mod_graficos_ui <- function(id) {
         )
       ),
 
-      # ── Gráfico ──
-      card(
-        card_header("Resultado"),
-        card_body(
-          plotOutput(ns("grafico_principal"), height = "420px"),
-          hr(),
-          uiOutput(ns("nota_grafico")),
-          hr(),
-          card(
-            card_header(
-              class = "d-flex justify-content-between align-items-center",
-              tagList(bs_icon("code-slash"), " Código R reproducible"),
-              downloadButton(
-                ns("descargar_script"),
-                label = "Descargar .R",
-                icon  = bs_icon("download"),
-                class = "btn-sm btn-outline-primary"
+      # ── Gráfico + Nota ──
+      layout_columns(
+        col_widths = c(7, 5),
+        gap = "1rem",
+
+        # Gráfico y código
+        card(
+          card_header("Resultado"),
+          card_body(
+            div(
+              style = "height: 420px;",
+              plotOutput(ns("grafico_principal"), height = "100%")
+            ),
+            hr(),
+            accordion(
+              open = FALSE,
+              accordion_panel(
+                title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+                value = "codigo_r",
+                p("Script que reproduce este gráfico con tus datos.",
+                  class = "text-muted small mb-2"),
+                verbatimTextOutput(ns("codigo_r")),
+                downloadButton(
+                  ns("descargar_script"),
+                  label = "Descargar .R",
+                  icon  = bs_icon("download"),
+                  class = "btn-sm btn-outline-primary mt-2"
+                )
               )
-            ),
-            p(
-              "Script que reproduce este gráfico con tus datos.",
-              class = "text-muted small px-3 pt-2 mb-1"
-            ),
-            verbatimTextOutput(ns("codigo_r"))
+            )
           )
+        ),
+
+        # Nota didáctica
+        card(
+          card_header(tagList(bs_icon("info-circle"), " Sobre este gráfico")),
+          card_body(
+            uiOutput(ns("nota_grafico"))
+          ),
+          style = "height: 100%;"
         )
       )
     )
@@ -198,6 +218,65 @@ mod_graficos_server <- function(id, datos) {
       }
     })
 
+    # ── Etiquetas de ejes ──
+    output$input_eje_x <- renderUI({
+      req(input$tipo_grafico, input$var_graf)
+      tipo  <- input$tipo_grafico
+      grupo <- input$grupo_graf
+
+      tiene_eje_x <- tipo %in% c("histograma", "densidad", "dispersion", "barras") ||
+        (tipo %in% c("boxplot", "violin") && !is.null(grupo) && grupo != "ninguno")
+
+      if (tiene_eje_x) {
+        placeholder <- if (tipo %in% c("boxplot", "violin") && !is.null(grupo) && grupo != "ninguno")
+          grupo
+        else
+          input$var_graf
+        textInput(ns("eje_x"), "Etiqueta eje X (opcional)", placeholder = placeholder)
+      }
+    })
+
+    output$input_eje_y <- renderUI({
+      req(input$tipo_grafico)
+      tipo <- input$tipo_grafico
+      label_default <- switch(tipo,
+                              "histograma" = "Frecuencia",
+                              "densidad"   = "Densidad",
+                              "barras"     = "Frecuencia",
+                              "boxplot"    = input$var_graf,
+                              "violin"     = input$var_graf,
+                              "dispersion" = input$var_y,
+                              NULL
+      )
+      if (!is.null(label_default)) {
+        textInput(ns("eje_y"), "Etiqueta eje Y (opcional)", placeholder = label_default)
+      }
+    })
+
+    eje_x_activo <- reactive({
+      if (!is.null(input$eje_x) && nchar(trimws(input$eje_x)) > 0) return(input$eje_x)
+      tipo  <- input$tipo_grafico
+      grupo <- input$grupo_graf
+      if (tipo %in% c("boxplot", "violin") && !is.null(grupo) && grupo != "ninguno")
+        grupo
+      else
+        input$var_graf
+    })
+
+    eje_y_activo <- reactive({
+      if (!is.null(input$eje_y) && nchar(trimws(input$eje_y)) > 0) return(input$eje_y)
+      tipo <- input$tipo_grafico
+      switch(tipo,
+             "histograma" = "Frecuencia",
+             "densidad"   = "Densidad",
+             "barras"     = "Frecuencia",
+             "boxplot"    = input$var_graf,
+             "violin"     = input$var_graf,
+             "dispersion" = input$var_y,
+             ""
+      )
+    })
+
     # ── Color y título ──
     color_activo <- reactive({
       if (!is.null(input$color_principal) && nchar(input$color_principal) == 7)
@@ -225,21 +304,23 @@ mod_graficos_server <- function(id, datos) {
     output$grafico_principal <- renderPlot({
       req(datos(), input$tipo_grafico, input$var_graf)
       df    <- datos()
-      color <- color_activo()
+      color  <- color_activo()
       titulo <- titulo_activo()
-      tipo  <- input$tipo_grafico
+      tipo   <- input$tipo_grafico
+      eje_x  <- eje_x_activo()
+      eje_y  <- eje_y_activo()
 
       if (tipo == "histograma") {
         bins <- if (!is.null(input$n_bins)) input$n_bins else nclass.Sturges(df[[input$var_graf]])
         ggplot(df, aes(x = .data[[input$var_graf]])) +
           geom_histogram(fill = color, color = "white", bins = bins, alpha = 0.85) +
-          labs(title = titulo, x = input$var_graf, y = "Frecuencia") +
+          labs(title = titulo, x = eje_x, y = eje_y) +
           base_theme
 
       } else if (tipo == "densidad") {
         ggplot(df, aes(x = .data[[input$var_graf]])) +
           geom_density(fill = color, color = colores$primario, alpha = 0.6) +
-          labs(title = titulo, x = input$var_graf, y = "Densidad") +
+          labs(title = titulo, x = eje_x, y = eje_y) +
           base_theme
 
       } else if (tipo == "boxplot") {
@@ -250,13 +331,13 @@ mod_graficos_server <- function(id, datos) {
             geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.fill = "white") +
             geom_jitter(width = 0.15, alpha = 0.4, size = 1.5) +
             scale_fill_brewer(palette = "Set2") +
-            labs(title = titulo, x = grupo, y = input$var_graf) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme + theme(legend.position = "none")
         } else {
           ggplot(df, aes(x = "", y = .data[[input$var_graf]])) +
             geom_boxplot(fill = color, alpha = 0.7, width = 0.4,
                          outlier.shape = 21, outlier.fill = "white") +
-            labs(title = titulo, x = NULL, y = input$var_graf) +
+            labs(title = titulo, x = NULL, y = eje_y) +
             base_theme
         }
 
@@ -268,13 +349,13 @@ mod_graficos_server <- function(id, datos) {
             geom_violin(alpha = 0.6) +
             geom_jitter(width = 0.1, alpha = 0.5, size = 1.8) +
             scale_fill_brewer(palette = "Set2") +
-            labs(title = titulo, x = grupo, y = input$var_graf) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme + theme(legend.position = "none")
         } else {
           ggplot(df, aes(x = "", y = .data[[input$var_graf]])) +
             geom_violin(fill = color, color = colores$primario, alpha = 0.6) +
             geom_jitter(color = colores$primario, width = 0.08, alpha = 0.6, size = 1.8) +
-            labs(title = titulo, x = NULL, y = input$var_graf) +
+            labs(title = titulo, x = NULL, y = eje_y) +
             base_theme
         }
 
@@ -284,7 +365,7 @@ mod_graficos_server <- function(id, datos) {
           ggplot(aes(x = reorder(.data[[input$var_graf]], n), y = n)) +
           geom_col(fill = color, alpha = 0.85) +
           coord_flip() +
-          labs(title = titulo, x = NULL, y = "Frecuencia") +
+          labs(title = titulo, x = NULL, y = eje_y) +
           base_theme
 
       } else if (tipo == "dispersion") {
@@ -296,14 +377,14 @@ mod_graficos_server <- function(id, datos) {
             geom_point(alpha = 0.7, size = 2.5) +
             geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
             scale_color_brewer(palette = "Set2") +
-            labs(title = titulo, x = input$var_graf, y = input$var_y) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme
         } else {
           ggplot(df, aes(x = .data[[input$var_graf]], y = .data[[input$var_y]])) +
             geom_point(color = color, alpha = 0.7, size = 2.5) +
             geom_smooth(method = "lm", se = TRUE, fill = paste0(color, "40"),
                         color = colores$primario, linewidth = 0.8) +
-            labs(title = titulo, x = input$var_graf, y = input$var_y) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme
         }
       }
@@ -315,11 +396,43 @@ mod_graficos_server <- function(id, datos) {
       if (input$tipo_grafico == "") return(NULL)
       nota <- notas_graficos[[input$tipo_grafico]]
       if (is.null(nota)) return(NULL)
+
+      nombre_grafico <- switch(input$tipo_grafico,
+                               "histograma" = "Histograma",
+                               "densidad"   = "Gráfico de densidad",
+                               "boxplot"    = "Diagrama de caja (Boxplot)",
+                               "violin"     = "Gráfico de violín",
+                               "barras"     = "Gráfico de barras",
+                               "dispersion" = "Gráfico de dispersión"
+      )
+
+      cuando_usar <- switch(input$tipo_grafico,
+                            "histograma" = "Usalo cuando querés ver cómo se distribuyen los valores de una variable numérica y cuántas observaciones caen en cada intervalo.",
+                            "densidad"   = "Usalo cuando querés una vista suavizada de la distribución, especialmente útil para comparar grupos superpuestos.",
+                            "boxplot"    = "Usalo cuando querés comparar la distribución entre grupos o identificar valores atípicos rápidamente.",
+                            "violin"     = "Usalo cuando además de comparar grupos, querés ver la forma completa de la distribución en cada uno.",
+                            "barras"     = "Usalo cuando querés comparar la frecuencia o conteo de las categorías de una variable.",
+                            "dispersion" = "Usalo cuando querés explorar si existe una relación o tendencia entre dos variables numéricas."
+      )
+
       tags$div(
-        class = "small",
-        style = paste0("border-left: 3px solid ", colores$acento, "; padding-left: 10px;"),
-        tags$p(tags$strong("✅ Ventaja: "), nota$ventaja, class = "mb-1"),
-        tags$p(tags$strong("⚠️ Limitación: "), nota$desventaja, class = "mb-0")
+        tags$p(tags$strong(nombre_grafico), style = "font-size: 1.05rem; color: #1170AA;"),
+        tags$hr(),
+        tags$div(
+          style = paste0("border-left: 4px solid ", colores$exito, "; padding-left: 12px; margin-bottom: 1rem;"),
+          tags$p(tags$strong("✅ Ventaja"), class = "mb-1", style = "font-size: 0.95rem;"),
+          tags$p(nota$ventaja, style = "font-size: 0.9rem; color: #57606C;")
+        ),
+        tags$div(
+          style = paste0("border-left: 4px solid ", colores$advertencia, "; padding-left: 12px; margin-bottom: 1rem;"),
+          tags$p(tags$strong("⚠️ Limitación"), class = "mb-1", style = "font-size: 0.95rem;"),
+          tags$p(nota$desventaja, style = "font-size: 0.9rem; color: #57606C;")
+        ),
+        tags$div(
+          style = paste0("border-left: 4px solid ", colores$secundario, "; padding-left: 12px;"),
+          tags$p(tags$strong("💡 ¿Cuándo usarlo?"), class = "mb-1", style = "font-size: 0.95rem;"),
+          tags$p(cuando_usar, style = "font-size: 0.9rem; color: #57606C;")
+        )
       )
     })
 

@@ -12,6 +12,7 @@ library(effectsize)
 library(bayestestR)
 library(datawizard)
 library(insight)
+library(correlation)
 library(readxl)
 library(DT)
 library(scales)
@@ -67,7 +68,7 @@ tema_app <- bs_theme(
   .navbar .nav-link.active { border-bottom: 2px solid #FC7D0B; }
   .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
   .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
-  .card > .card-header { background-color: #C8D9EC; color: #1170AA; font-weight: 700;
+  .card > .card-header { background-color: #5FA2CE; color: #ffffff; font-weight: 700;
                          border-bottom: none; }
 ")
 

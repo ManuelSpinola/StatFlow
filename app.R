@@ -19,6 +19,8 @@ source("modules/mod_explorar.R")
 source("modules/mod_graficos.R")
 source("modules/mod_medias.R")
 source("modules/mod_frecuencias.R")
+source("modules/mod_correlacion.R")
+source("modules/mod_valores_p.R")
 source("modules/mod_ayuda.R")
 source("modules/mod_acerca_de.R")
 
@@ -40,12 +42,14 @@ ui <- page_navbar(
     "Manuel Spínola · ICOMVIS · Universidad Nacional · Costa Rica"
   ),
 
-  nav_panel(title = "Mis datos",           icon = bs_icon("folder2-open"),  mod_datos_ui("datos")),
-  nav_panel(title = "Explorar",            icon = bs_icon("search"),         mod_explorar_ui("explorar")),
-  nav_panel(title = "Gráficos",            icon = bs_icon("graph-up"),       mod_graficos_ui("graficos")),
-  nav_panel(title = "Comparar medias",     icon = bs_icon("bar-chart"),      mod_medias_ui("medias")),
-  nav_panel(title = "Comparar frecuencias",icon = bs_icon("pie-chart"),      mod_frecuencias_ui("frecuencias")),
-  nav_panel(title = "Ayuda",               icon = bs_icon("question-circle"),mod_ayuda_ui("ayuda")),
+  nav_panel(title = "Mis datos",           icon = bs_icon("folder2-open"),   mod_datos_ui("datos")),
+  nav_panel(title = "Explorar",            icon = bs_icon("search"),          mod_explorar_ui("explorar")),
+  nav_panel(title = "Gráficos",            icon = bs_icon("graph-up"),        mod_graficos_ui("graficos")),
+  nav_panel(title = "Comparar medias",     icon = bs_icon("bar-chart"),       mod_medias_ui("medias")),
+  nav_panel(title = "Comparar frecuencias",icon = bs_icon("pie-chart"),       mod_frecuencias_ui("frecuencias")),
+  nav_panel(title = "Correlación",         icon = bs_icon("diagram-3"),       mod_correlacion_ui("correlacion")),
+  nav_panel(title = "Valores de p",        icon = bs_icon("bar-chart-steps"), mod_valores_p_ui("valores_p")),
+  nav_panel(title = "Ayuda",               icon = bs_icon("question-circle"), mod_ayuda_ui("ayuda")),
   mod_acerca_de_ui("acerca_de"),
 
   nav_spacer(),
@@ -63,6 +67,8 @@ server <- function(input, output, session) {
   mod_graficos_server("graficos", datos = datos_activos)
   mod_medias_server("medias",     datos = datos_activos)
   mod_frecuencias_server("frecuencias", datos = datos_activos)
+  mod_correlacion_server("correlacion", datos = datos_activos)
+  mod_valores_p_server("valores_p")
   mod_ayuda_server("ayuda")
   mod_acerca_de_server("acerca_de")
 }

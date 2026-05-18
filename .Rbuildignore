@@ -4,3 +4,5 @@
 ^renv\.lock$
 ^\.github$
 ^README\.Rmd$
+^\.positai$
+^\.claude$

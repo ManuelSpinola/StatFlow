@@ -1,43 +1,33 @@
-# StatFlow <img src="www/hexsticker_StatFlow.png" align="right" height="120"/>
+# StatFlow <img src="inst/app/www/hexsticker_StatFlow.png" align="right" height="139"/>
 
-> Herramienta interactiva de análisis estadístico y visualización de datos
-> para usuarios sin experiencia en programación ni estadística.
+**StatFlow** es una plataforma interactiva para análisis exploratorio de datos, parte del ecosistema [StatSuite](https://github.com/ManuelSpinola). Diseñada como punto de entrada al análisis de datos en ecología y ciencias de la biodiversidad.
 
-Parte de la suite **StatSuite**:
+## Módulos disponibles
 
-| App | Descripción | Estado |
-|-----|-------------|--------|
-| **StatFlow** | Primeros análisis y visualización de datos | ✅ Disponible |
-| [StatDesign](https://github.com/ManuelSpinola/StatDesign) | Diseño de estudios y muestreo | ✅ Disponible |
-| StatModels | Modelos estadísticos avanzados | 🔜 Próximamente |
+| Módulo | Descripción |
+|--------|-------------|
+| Mis datos | Cargar y previsualizar datos propios |
+| Explorar | Estadísticas descriptivas y resúmenes |
+| Gráficos | Visualizaciones interactivas |
+| Comparar medias | Pruebas t, ANOVA |
+| Comparar frecuencias | Chi-cuadrado, tablas de contingencia |
+| Correlación | Correlaciones y matrices |
+| Valores de p | Interpretación de valores de p |
+| Ayuda | Documentación y referencias |
+| Acerca de | Información del proyecto |
 
-## Estructura del proyecto
-
-```
-StatFlow/
-├── app.R
-├── DESCRIPTION
-├── R/
-│   └── helpers.R
-└── modules/
-    ├── mod_datos.R
-    ├── mod_explorar.R
-    ├── mod_graficos.R
-    ├── mod_medias.R
-    ├── mod_frecuencias.R
-    └── mod_ayuda.R
-```
-
-## Instalación local
+## Instalación
 
 ```r
-install.packages(c(
-  "shiny", "bslib", "bsicons", "tidyverse",
-  "readxl", "DT", "scales",
-  "parameters", "performance", "effectsize",
-  "bayestestR", "datawizard", "insight"
-))
-shiny::runApp()
+install.packages("remotes")
+remotes::install_github("ManuelSpinola/StatFlow")
+```
+
+## Uso
+
+```r
+library(StatFlow)
+StatFlow::run_app()
 ```
 
 ## Autor

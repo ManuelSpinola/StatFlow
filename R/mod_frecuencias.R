@@ -8,13 +8,13 @@
 mod_frecuencias_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    bslib::layout_columns(
+    layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      bslib::card(
-        bslib::card_header(tagList(bsicons::bs_icon("pie-chart"), " Opciones")),
-        bslib::card_body(
+      card(
+        card_header(tagList(bs_icon("pie-chart"), " Opciones")),
+        card_body(
           uiOutput(ns("sel_var_resultado")),
           uiOutput(ns("sel_categoria")),
           hr(),
@@ -40,11 +40,11 @@ mod_frecuencias_ui <- function(id) {
       ),
 
       # ── Resultados ──
-      bslib::card(
-        bslib::card_header("Resultados de la comparación"),
-        bslib::card_body(
+      card(
+        card_header("Resultados de la comparación"),
+        card_body(
           uiOutput(ns("resultado_texto")),
-          bslib::layout_columns(
+          layout_columns(
             col_widths = c(6, 6),
             plotOutput(ns("grafico_proporciones"), height = "340px"),
             plotOutput(ns("grafico_diferencia"),   height = "340px")
@@ -53,7 +53,7 @@ mod_frecuencias_ui <- function(id) {
           accordion(
             open = FALSE,
             accordion_panel(
-              title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
+              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
               value = "panel_codigo",
               p(
                 "Script que reproduce esta comparación de proporciones con tus datos.",
@@ -63,7 +63,7 @@ mod_frecuencias_ui <- function(id) {
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
-                icon  = bsicons::bs_icon("download"),
+                icon  = bs_icon("download"),
                 class = "btn-sm btn-outline-primary mt-2"
               )
             )
@@ -221,9 +221,9 @@ mod_frecuencias_server <- function(id, datos) {
             " alguno de los grupos tiene pocas observaciones, por lo que la aproximación
               chi-cuadrado puede ser imprecisa. Interpretá los intervalos con cautela."
           ),
-        bslib::layout_columns(
+        layout_columns(
           col_widths = c(6, 6),
-          bslib::value_box(
+          value_box(
             title    = paste0("Proporción — ", res$grupo_a,
                               " (", res$x_a, "/", res$n_a, ")"),
             value    = paste0(round(res$prop_a * 100, 1), "%",
@@ -232,7 +232,7 @@ mod_frecuencias_server <- function(id, datos) {
             showcase = bsicons::bs_icon("pie-chart-fill"),
             theme    = "primary"
           ),
-          bslib::value_box(
+          value_box(
             title    = paste0("Proporción — ", res$grupo_b,
                               " (", res$x_b, "/", res$n_b, ")"),
             value    = paste0(round(res$prop_b * 100, 1), "%",
@@ -243,8 +243,8 @@ mod_frecuencias_server <- function(id, datos) {
           )
         ),
         br(),
-        bslib::card(
-          bslib::card_body(
+        card(
+          card_body(
             tags$p(
               "La categoría ", tags$strong(paste0("'", res$categoria, "'")),
               " aparece con mayor frecuencia en ",

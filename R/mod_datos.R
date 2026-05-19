@@ -115,16 +115,16 @@ mod_datos_server <- function(id) {
       }
 
       # Convertir character a factor
-      df |> dplyr::mutate(across(where(is.character), as.factor))
+      df |> mutate(across(where(is.character), as.factor))
     })
 
     # ── Info de columnas ──
     output$info_columnas <- renderUI({
       df <- datos()
-      tipos <- map_chr(df, tipo_variable)
+      tipos <- purrr::map_chr(df, tipo_variable)
       tags$div(
         class = "d-flex flex-wrap gap-2 mb-2",
-        imap(tipos, function(tipo, nombre) {
+        purrr::imap(tipos, function(tipo, nombre) {
           estilo <- if (tipo == "Numérica")
             paste0("background-color:", colores$primario, "; color:#ffffff;")
           else

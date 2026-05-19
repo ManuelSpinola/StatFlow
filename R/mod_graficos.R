@@ -137,11 +137,11 @@ mod_graficos_server <- function(id, datos) {
     # ── Columnas por tipo ──
     cols_num <- reactive({
       req(datos())
-      names(datos())[map_lgl(datos(), is.numeric)]
+      names(datos())[purrr::map_lgl(datos(), is.numeric)]
     })
     cols_cat <- reactive({
       req(datos())
-      names(datos())[!map_lgl(datos(), is.numeric)]
+      names(datos())[!purrr::map_lgl(datos(), is.numeric)]
     })
 
     # ── Selector de tipo de gráfico ──
@@ -293,11 +293,11 @@ mod_graficos_server <- function(id, datos) {
     })
 
     # ── Tema base ──
-    base_theme <- ggplot2::theme_minimal(base_size = 14) +
-      ggplot2::theme(
-        plot.title       = ggplot2::element_text(face = "bold", color = colores$primario),
-        plot.background  = ggplot2::element_rect(fill = "transparent", color = NA),
-        panel.background = ggplot2::element_rect(fill = "transparent", color = NA)
+    base_theme <- theme_minimal(base_size = 14) +
+      theme(
+        plot.title       = element_text(face = "bold", color = colores$primario),
+        plot.background  = element_rect(fill = "transparent", color = NA),
+        panel.background = element_rect(fill = "transparent", color = NA)
       )
 
     # ── Gráfico principal ──
@@ -312,79 +312,79 @@ mod_graficos_server <- function(id, datos) {
 
       if (tipo == "histograma") {
         bins <- if (!is.null(input$n_bins)) input$n_bins else nclass.Sturges(df[[input$var_graf]])
-        ggplot2::ggplot(df, ggplot2::aes(x = .data[[input$var_graf]])) +
-          ggplot2::geom_histogram(fill = color, color = "white", bins = bins, alpha = 0.85) +
-          ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
+        ggplot(df, aes(x = .data[[input$var_graf]])) +
+          geom_histogram(fill = color, color = "white", bins = bins, alpha = 0.85) +
+          labs(title = titulo, x = eje_x, y = eje_y) +
           base_theme
 
       } else if (tipo == "densidad") {
-        ggplot2::ggplot(df, ggplot2::aes(x = .data[[input$var_graf]])) +
-          ggplot2::geom_density(fill = color, color = colores$primario, alpha = 0.6) +
-          ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
+        ggplot(df, aes(x = .data[[input$var_graf]])) +
+          geom_density(fill = color, color = colores$primario, alpha = 0.6) +
+          labs(title = titulo, x = eje_x, y = eje_y) +
           base_theme
 
       } else if (tipo == "boxplot") {
         grupo <- input$grupo_graf
         if (!is.null(grupo) && grupo != "ninguno") {
-          ggplot2::ggplot(df, ggplot2::aes(x = .data[[grupo]], y = .data[[input$var_graf]],
+          ggplot(df, aes(x = .data[[grupo]], y = .data[[input$var_graf]],
                          fill = .data[[grupo]])) +
-            ggplot2::geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.fill = "white") +
+            geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.fill = "white") +
             geom_jitter(width = 0.15, alpha = 0.4, size = 1.5) +
             scale_fill_brewer(palette = "Set2") +
-            ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
-            base_theme + ggplot2::theme(legend.position = "none")
+            labs(title = titulo, x = eje_x, y = eje_y) +
+            base_theme + theme(legend.position = "none")
         } else {
-          ggplot2::ggplot(df, ggplot2::aes(x = "", y = .data[[input$var_graf]])) +
-            ggplot2::geom_boxplot(fill = color, alpha = 0.7, width = 0.4,
+          ggplot(df, aes(x = "", y = .data[[input$var_graf]])) +
+            geom_boxplot(fill = color, alpha = 0.7, width = 0.4,
                          outlier.shape = 21, outlier.fill = "white") +
-            ggplot2::labs(title = titulo, x = NULL, y = eje_y) +
+            labs(title = titulo, x = NULL, y = eje_y) +
             base_theme
         }
 
       } else if (tipo == "violin") {
         grupo <- input$grupo_graf
         if (!is.null(grupo) && grupo != "ninguno") {
-          ggplot2::ggplot(df, ggplot2::aes(x = .data[[grupo]], y = .data[[input$var_graf]],
+          ggplot(df, aes(x = .data[[grupo]], y = .data[[input$var_graf]],
                          fill = .data[[grupo]])) +
             geom_violin(alpha = 0.6) +
             geom_jitter(width = 0.1, alpha = 0.5, size = 1.8) +
             scale_fill_brewer(palette = "Set2") +
-            ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
-            base_theme + ggplot2::theme(legend.position = "none")
+            labs(title = titulo, x = eje_x, y = eje_y) +
+            base_theme + theme(legend.position = "none")
         } else {
-          ggplot2::ggplot(df, ggplot2::aes(x = "", y = .data[[input$var_graf]])) +
+          ggplot(df, aes(x = "", y = .data[[input$var_graf]])) +
             geom_violin(fill = color, color = colores$primario, alpha = 0.6) +
             geom_jitter(color = colores$primario, width = 0.08, alpha = 0.6, size = 1.8) +
-            ggplot2::labs(title = titulo, x = NULL, y = eje_y) +
+            labs(title = titulo, x = NULL, y = eje_y) +
             base_theme
         }
 
       } else if (tipo == "barras") {
         df %>%
-          dplyr::count(.data[[input$var_graf]]) %>%
-          ggplot2::ggplot(ggplot2::aes(x = reorder(.data[[input$var_graf]], n), y = n)) +
-          ggplot2::geom_col(fill = color, alpha = 0.85) +
-          ggplot2::coord_flip() +
-          ggplot2::labs(title = titulo, x = NULL, y = eje_y) +
+          count(.data[[input$var_graf]]) %>%
+          ggplot(aes(x = reorder(.data[[input$var_graf]], n), y = n)) +
+          geom_col(fill = color, alpha = 0.85) +
+          coord_flip() +
+          labs(title = titulo, x = NULL, y = eje_y) +
           base_theme
 
       } else if (tipo == "dispersion") {
         req(input$var_y)
         grupo <- input$grupo_graf
         if (!is.null(grupo) && grupo != "ninguno") {
-          ggplot2::ggplot(df, ggplot2::aes(x = .data[[input$var_graf]], y = .data[[input$var_y]],
+          ggplot(df, aes(x = .data[[input$var_graf]], y = .data[[input$var_y]],
                          color = .data[[grupo]])) +
-            ggplot2::geom_point(alpha = 0.7, size = 2.5) +
-            ggplot2::geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
+            geom_point(alpha = 0.7, size = 2.5) +
+            geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
             scale_color_brewer(palette = "Set2") +
-            ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme
         } else {
-          ggplot2::ggplot(df, ggplot2::aes(x = .data[[input$var_graf]], y = .data[[input$var_y]])) +
-            ggplot2::geom_point(color = color, alpha = 0.7, size = 2.5) +
-            ggplot2::geom_smooth(method = "lm", se = TRUE, fill = paste0(color, "40"),
+          ggplot(df, aes(x = .data[[input$var_graf]], y = .data[[input$var_y]])) +
+            geom_point(color = color, alpha = 0.7, size = 2.5) +
+            geom_smooth(method = "lm", se = TRUE, fill = paste0(color, "40"),
                         color = colores$primario, linewidth = 0.8) +
-            ggplot2::labs(title = titulo, x = eje_x, y = eje_y) +
+            labs(title = titulo, x = eje_x, y = eje_y) +
             base_theme
         }
       }
@@ -456,88 +456,88 @@ mod_graficos_server <- function(id, datos) {
       geom <- if (tipo == "histograma") {
         bins <- if (!is.null(input$n_bins)) input$n_bins else "nclass.Sturges(datos$`var`)"
         paste0(
-          "ggplot2::ggplot(datos, ggplot2::aes(x = `", var_x, "`)) +\n",
-          "  ggplot2::geom_histogram(fill = \"", color, "\", color = \"white\",\n",
+          "ggplot(datos, aes(x = `", var_x, "`)) +\n",
+          "  geom_histogram(fill = \"", color, "\", color = \"white\",\n",
           "                 bins = ", bins, ", alpha = 0.85) +\n",
-          "  ggplot2::labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Frecuencia\") +\n",
-          "  ggplot2::theme_minimal()\n"
+          "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Frecuencia\") +\n",
+          "  theme_minimal()\n"
         )
       } else if (tipo == "densidad") {
         paste0(
-          "ggplot2::ggplot(datos, ggplot2::aes(x = `", var_x, "`)) +\n",
-          "  ggplot2::geom_density(fill = \"", color, "\", alpha = 0.6) +\n",
-          "  ggplot2::labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Densidad\") +\n",
-          "  ggplot2::theme_minimal()\n"
+          "ggplot(datos, aes(x = `", var_x, "`)) +\n",
+          "  geom_density(fill = \"", color, "\", alpha = 0.6) +\n",
+          "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"Densidad\") +\n",
+          "  theme_minimal()\n"
         )
       } else if (tipo == "boxplot") {
         if (!is.null(grupo) && grupo != "ninguno") {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = `", grupo, "`, y = `", var_x, "`,\n",
+            "ggplot(datos, aes(x = `", grupo, "`, y = `", var_x, "`,\n",
             "                  fill = `", grupo, "`)) +\n",
-            "  ggplot2::geom_boxplot(alpha = 0.7, outlier.shape = 21) +\n",
+            "  geom_boxplot(alpha = 0.7, outlier.shape = 21) +\n",
             "  geom_jitter(width = 0.15, alpha = 0.4, size = 1.5) +\n",
             "  scale_fill_brewer(palette = \"Set2\") +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
-            "  ggplot2::theme_minimal() + ggplot2::theme(legend.position = \"none\")\n"
+            "  labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
+            "  theme_minimal() + theme(legend.position = \"none\")\n"
           )
         } else {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = \"\", y = `", var_x, "`)) +\n",
-            "  ggplot2::geom_boxplot(fill = \"", color, "\", alpha = 0.7, width = 0.4) +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
-            "  ggplot2::theme_minimal()\n"
+            "ggplot(datos, aes(x = \"\", y = `", var_x, "`)) +\n",
+            "  geom_boxplot(fill = \"", color, "\", alpha = 0.7, width = 0.4) +\n",
+            "  labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
+            "  theme_minimal()\n"
           )
         }
       } else if (tipo == "violin") {
         if (!is.null(grupo) && grupo != "ninguno") {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = `", grupo, "`, y = `", var_x, "`,\n",
+            "ggplot(datos, aes(x = `", grupo, "`, y = `", var_x, "`,\n",
             "                  fill = `", grupo, "`)) +\n",
             "  geom_violin(alpha = 0.6) +\n",
             "  geom_jitter(width = 0.1, alpha = 0.5, size = 1.8) +\n",
             "  scale_fill_brewer(palette = \"Set2\") +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
-            "  ggplot2::theme_minimal() + ggplot2::theme(legend.position = \"none\")\n"
+            "  labs(title = \"", tit, "\", x = \"", grupo, "\", y = \"", var_x, "\") +\n",
+            "  theme_minimal() + theme(legend.position = \"none\")\n"
           )
         } else {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = \"\", y = `", var_x, "`)) +\n",
+            "ggplot(datos, aes(x = \"\", y = `", var_x, "`)) +\n",
             "  geom_violin(fill = \"", color, "\", alpha = 0.6) +\n",
             "  geom_jitter(width = 0.08, alpha = 0.6, size = 1.8) +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
-            "  ggplot2::theme_minimal()\n"
+            "  labs(title = \"", tit, "\", x = NULL, y = \"", var_x, "\") +\n",
+            "  theme_minimal()\n"
           )
         }
       } else if (tipo == "barras") {
         paste0(
           "datos |>\n",
-          "  dplyr::count(`", var_x, "`) |>\n",
-          "  ggplot2::ggplot(ggplot2::aes(x = reorder(`", var_x, "`, n), y = n)) +\n",
-          "  ggplot2::geom_col(fill = \"", color, "\", alpha = 0.85) +\n",
-          "  ggplot2::coord_flip() +\n",
-          "  ggplot2::labs(title = \"", tit, "\", x = NULL, y = \"Frecuencia\") +\n",
-          "  ggplot2::theme_minimal()\n"
+          "  count(`", var_x, "`) |>\n",
+          "  ggplot(aes(x = reorder(`", var_x, "`, n), y = n)) +\n",
+          "  geom_col(fill = \"", color, "\", alpha = 0.85) +\n",
+          "  coord_flip() +\n",
+          "  labs(title = \"", tit, "\", x = NULL, y = \"Frecuencia\") +\n",
+          "  theme_minimal()\n"
         )
       } else if (tipo == "dispersion") {
         req(input$var_y)
         var_y <- input$var_y
         if (!is.null(grupo) && grupo != "ninguno") {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = `", var_x, "`, y = `", var_y, "`,\n",
+            "ggplot(datos, aes(x = `", var_x, "`, y = `", var_y, "`,\n",
             "                  color = `", grupo, "`)) +\n",
-            "  ggplot2::geom_point(alpha = 0.7, size = 2.5) +\n",
-            "  ggplot2::geom_smooth(method = \"lm\", se = FALSE, linewidth = 0.8) +\n",
+            "  geom_point(alpha = 0.7, size = 2.5) +\n",
+            "  geom_smooth(method = \"lm\", se = FALSE, linewidth = 0.8) +\n",
             "  scale_color_brewer(palette = \"Set2\") +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
-            "  ggplot2::theme_minimal()\n"
+            "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
+            "  theme_minimal()\n"
           )
         } else {
           paste0(
-            "ggplot2::ggplot(datos, ggplot2::aes(x = `", var_x, "`, y = `", var_y, "`)) +\n",
-            "  ggplot2::geom_point(color = \"", color, "\", alpha = 0.7, size = 2.5) +\n",
-            "  ggplot2::geom_smooth(method = \"lm\", se = TRUE, linewidth = 0.8) +\n",
-            "  ggplot2::labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
-            "  ggplot2::theme_minimal()\n"
+            "ggplot(datos, aes(x = `", var_x, "`, y = `", var_y, "`)) +\n",
+            "  geom_point(color = \"", color, "\", alpha = 0.7, size = 2.5) +\n",
+            "  geom_smooth(method = \"lm\", se = TRUE, linewidth = 0.8) +\n",
+            "  labs(title = \"", tit, "\", x = \"", var_x, "\", y = \"", var_y, "\") +\n",
+            "  theme_minimal()\n"
           )
         }
       } else {

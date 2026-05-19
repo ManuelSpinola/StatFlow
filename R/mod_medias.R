@@ -9,13 +9,13 @@
 mod_medias_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    bslib::layout_columns(
+    layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      bslib::card(
-        bslib::card_header(tagList(bsicons::bs_icon("bar-chart"), " Opciones")),
-        bslib::card_body(
+      card(
+        card_header(tagList(bs_icon("bar-chart"), " Opciones")),
+        card_body(
           uiOutput(ns("sel_variable_comp")),
           uiOutput(ns("sel_grupo_comp")),
           hr(),
@@ -40,11 +40,11 @@ mod_medias_ui <- function(id) {
       ),
 
       # ── Resultados ──
-      bslib::card(
-        bslib::card_header("Resultados de la comparación"),
-        bslib::card_body(
+      card(
+        card_header("Resultados de la comparación"),
+        card_body(
           uiOutput(ns("resultado_texto")),
-          bslib::layout_columns(
+          layout_columns(
             col_widths = c(6, 6),
             plotOutput(ns("grafico_comparacion"), height = "480px"),
             plotOutput(ns("grafico_efecto"),      height = "480px")
@@ -53,7 +53,7 @@ mod_medias_ui <- function(id) {
           accordion(
             open = FALSE,
             accordion_panel(
-              title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
+              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
               value = "panel_codigo",
               p(
                 "Script que reproduce esta comparación de medias con tus datos.",
@@ -63,7 +63,7 @@ mod_medias_ui <- function(id) {
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
-                icon  = bsicons::bs_icon("download"),
+                icon  = bs_icon("download"),
                 class = "btn-sm btn-outline-primary mt-2"
               )
             )
@@ -78,8 +78,8 @@ mod_medias_server <- function(id, datos) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    cols_num <- reactive({ names(datos())[map_lgl(datos(), is.numeric)] })
-    cols_cat <- reactive({ names(datos())[!map_lgl(datos(), is.numeric)] })
+    cols_num <- reactive({ names(datos())[purrr::map_lgl(datos(), is.numeric)] })
+    cols_cat <- reactive({ names(datos())[!purrr::map_lgl(datos(), is.numeric)] })
 
     output$sel_variable_comp <- renderUI({
       req(length(cols_num()) > 0)
@@ -193,9 +193,9 @@ mod_medias_server <- function(id, datos) {
       )
 
       tagList(
-        bslib::layout_columns(
+        layout_columns(
           col_widths = c(6, 6),
-          bslib::value_box(
+          value_box(
             title    = paste("Media —", res$grupo_a),
             value    = paste0(res$media_a,
                               " [", round(res$ic_a$lwr.ci, 2),
@@ -203,7 +203,7 @@ mod_medias_server <- function(id, datos) {
             showcase = bsicons::bs_icon("bar-chart-fill"),
             theme    = "primary"
           ),
-          bslib::value_box(
+          value_box(
             title    = paste("Media —", res$grupo_b),
             value    = paste0(res$media_b,
                               " [", round(res$ic_b$lwr.ci, 2),
@@ -213,8 +213,8 @@ mod_medias_server <- function(id, datos) {
           )
         ),
         br(),
-        bslib::card(
-          bslib::card_body(
+        card(
+          card_body(
             tags$p(
               tags$strong(grupo_mayor), " tiene una media de ",
               tags$strong(res$variable), " mayor que ",

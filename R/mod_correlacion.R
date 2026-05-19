@@ -9,13 +9,13 @@
 mod_correlacion_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      card(
-        card_header(tagList(bs_icon("diagram-3"), " Opciones")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("diagram-3"), " Opciones")),
+        bslib::card_body(
           radioButtons(
             ns("modo"),
             "Tipo de análisis:",
@@ -77,9 +77,9 @@ mod_correlacion_ui <- function(id) {
       ),
 
       # ── Resultados ──
-      card(
-        card_header("Resultados"),
-        card_body(
+      bslib::card(
+        bslib::card_header("Resultados"),
+        bslib::card_body(
           uiOutput(ns("resultado_texto")),
 
           # Modo bivariado
@@ -95,13 +95,13 @@ mod_correlacion_ui <- function(id) {
             div(style = "height: 440px;",
                 plotOutput(ns("grafico_heatmap"), height = "100%")),
             br(),
-            DTOutput(ns("tabla_matriz"))
+            DT::DTOutput(ns("tabla_matriz"))
           ),
 
           accordion(
             open = FALSE,
             accordion_panel(
-              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
               value = "panel_codigo",
               p("Script que reproduce este análisis con tus datos.",
                 class = "text-muted small mb-2"),
@@ -109,7 +109,7 @@ mod_correlacion_ui <- function(id) {
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
-                icon  = bs_icon("download"),
+                icon  = bsicons::bs_icon("download"),
                 class = "btn-sm btn-outline-primary mt-2"
               )
             )
@@ -192,27 +192,27 @@ mod_correlacion_server <- function(id, datos) {
         else
           tags$span(class = "text-warning", "⚠️ no significativa (p ≥ 0.05)")
 
-        card(
-          card_body(
+        bslib::card(
+          bslib::card_body(
             class = "mb-3",
-            layout_columns(
+            bslib::layout_columns(
               col_widths = c(4, 4, 4),
-              value_box(
+              bslib::value_box(
                 title    = paste0("r de ", tools::toTitleCase(input$metodo)),
                 value    = r,
-                showcase = bs_icon("graph-up"),
+                showcase = bsicons::bs_icon("graph-up"),
                 theme    = "primary"
               ),
-              value_box(
+              bslib::value_box(
                 title    = "IC 95%",
                 value    = paste0("[", lwr, " – ", upr, "]"),
-                showcase = bs_icon("dash-lg"),
+                showcase = bsicons::bs_icon("dash-lg"),
                 theme    = "secondary"
               ),
-              value_box(
+              bslib::value_box(
                 title    = "Valor p",
                 value    = ifelse(p < 0.001, "< 0.001", round(p, 3)),
-                showcase = bs_icon("calculator"),
+                showcase = bsicons::bs_icon("calculator"),
                 theme    = if (p < 0.05) "success" else "warning"
               )
             ),
@@ -238,8 +238,8 @@ mod_correlacion_server <- function(id, datos) {
         n_pares <- nrow(res)
         n_sig   <- sum(res$p < 0.05, na.rm = TRUE)
 
-        card(
-          card_body(
+        bslib::card(
+          bslib::card_body(
             class = "mb-3",
             tags$p(
               "Matriz de correlaciones entre ", tags$strong(n_vars), " variables. ",
@@ -351,7 +351,7 @@ mod_correlacion_server <- function(id, datos) {
     })
 
     # ── Tabla matriz ──
-    output$tabla_matriz <- renderDT({
+    output$tabla_matriz <- DT::renderDT({
       req(input$calcular, corr_matriz(), input$modo == "matriz")
       res <- as.data.frame(corr_matriz()) %>%
         select(Variable1 = Parameter1, Variable2 = Parameter2,
@@ -361,7 +361,7 @@ mod_correlacion_server <- function(id, datos) {
           across(c(r, IC_bajo, IC_alto, t), ~ round(.x, 3)),
           p = ifelse(p < 0.001, "< 0.001", as.character(round(p, 3)))
         )
-      datatable(
+      DT::datatable(
         res,
         rownames  = FALSE,
         options   = list(pageLength = 10, dom = "tip", scrollX = TRUE),

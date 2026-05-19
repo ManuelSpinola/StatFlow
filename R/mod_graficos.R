@@ -50,13 +50,13 @@ notas_graficos <- list(
 mod_graficos_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      card(
-        card_header(tagList(bs_icon("graph-up"), " Opciones del gráfico")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("graph-up"), " Opciones del gráfico")),
+        bslib::card_body(
           uiOutput(ns("sel_tipo")),
           hr(),
           uiOutput(ns("sel_variable_graf")),
@@ -84,14 +84,14 @@ mod_graficos_ui <- function(id) {
       ),
 
       # ── Gráfico + Nota ──
-      layout_columns(
+      bslib::layout_columns(
         col_widths = c(7, 5),
         gap = "1rem",
 
         # Gráfico y código
-        card(
-          card_header("Resultado"),
-          card_body(
+        bslib::card(
+          bslib::card_header("Resultado"),
+          bslib::card_body(
             div(
               style = "height: 420px;",
               plotOutput(ns("grafico_principal"), height = "100%")
@@ -100,7 +100,7 @@ mod_graficos_ui <- function(id) {
             accordion(
               open = FALSE,
               accordion_panel(
-                title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+                title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
                 value = "codigo_r",
                 p("Script que reproduce este gráfico con tus datos.",
                   class = "text-muted small mb-2"),
@@ -108,7 +108,7 @@ mod_graficos_ui <- function(id) {
                 downloadButton(
                   ns("descargar_script"),
                   label = "Descargar .R",
-                  icon  = bs_icon("download"),
+                  icon  = bsicons::bs_icon("download"),
                   class = "btn-sm btn-outline-primary mt-2"
                 )
               )
@@ -117,9 +117,9 @@ mod_graficos_ui <- function(id) {
         ),
 
         # Nota didáctica
-        card(
-          card_header(tagList(bs_icon("info-circle"), " Sobre este gráfico")),
-          card_body(
+        bslib::card(
+          bslib::card_header(tagList(bsicons::bs_icon("info-circle"), " Sobre este gráfico")),
+          bslib::card_body(
             uiOutput(ns("nota_grafico"))
           ),
           style = "height: 100%;"

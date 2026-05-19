@@ -9,13 +9,13 @@
 mod_medias_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      card(
-        card_header(tagList(bs_icon("bar-chart"), " Opciones")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("bar-chart"), " Opciones")),
+        bslib::card_body(
           uiOutput(ns("sel_variable_comp")),
           uiOutput(ns("sel_grupo_comp")),
           hr(),
@@ -40,11 +40,11 @@ mod_medias_ui <- function(id) {
       ),
 
       # ── Resultados ──
-      card(
-        card_header("Resultados de la comparación"),
-        card_body(
+      bslib::card(
+        bslib::card_header("Resultados de la comparación"),
+        bslib::card_body(
           uiOutput(ns("resultado_texto")),
-          layout_columns(
+          bslib::layout_columns(
             col_widths = c(6, 6),
             plotOutput(ns("grafico_comparacion"), height = "480px"),
             plotOutput(ns("grafico_efecto"),      height = "480px")
@@ -53,7 +53,7 @@ mod_medias_ui <- function(id) {
           accordion(
             open = FALSE,
             accordion_panel(
-              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
               value = "panel_codigo",
               p(
                 "Script que reproduce esta comparación de medias con tus datos.",
@@ -63,7 +63,7 @@ mod_medias_ui <- function(id) {
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
-                icon  = bs_icon("download"),
+                icon  = bsicons::bs_icon("download"),
                 class = "btn-sm btn-outline-primary mt-2"
               )
             )
@@ -193,9 +193,9 @@ mod_medias_server <- function(id, datos) {
       )
 
       tagList(
-        layout_columns(
+        bslib::layout_columns(
           col_widths = c(6, 6),
-          value_box(
+          bslib::value_box(
             title    = paste("Media —", res$grupo_a),
             value    = paste0(res$media_a,
                               " [", round(res$ic_a$lwr.ci, 2),
@@ -203,7 +203,7 @@ mod_medias_server <- function(id, datos) {
             showcase = bsicons::bs_icon("bar-chart-fill"),
             theme    = "primary"
           ),
-          value_box(
+          bslib::value_box(
             title    = paste("Media —", res$grupo_b),
             value    = paste0(res$media_b,
                               " [", round(res$ic_b$lwr.ci, 2),
@@ -213,8 +213,8 @@ mod_medias_server <- function(id, datos) {
           )
         ),
         br(),
-        card(
-          card_body(
+        bslib::card(
+          bslib::card_body(
             tags$p(
               tags$strong(grupo_mayor), " tiene una media de ",
               tags$strong(res$variable), " mayor que ",

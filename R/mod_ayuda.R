@@ -5,12 +5,12 @@
 mod_ayuda_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(6, 6),
 
-      card(
-        card_header(tagList(bs_icon("question-circle"), " ¿Cómo usar esta herramienta?")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("question-circle"), " ¿Cómo usar esta herramienta?")),
+        bslib::card_body(
           tags$ol(
             class = "ps-3",
             tags$li(tags$strong("Mis datos:"), " Sube tu archivo Excel o CSV,",
@@ -35,9 +35,9 @@ mod_ayuda_ui <- function(id) {
         )
       ),
 
-      card(
-        card_header(tagList(bs_icon("book"), " Glosario básico")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("book"), " Glosario básico")),
+        bslib::card_body(
           tags$dl(
             tags$dt("Promedio (media)"),
             tags$dd("Suma de todos los valores dividida entre la cantidad de datos.",

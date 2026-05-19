@@ -5,13 +5,13 @@
 mod_datos_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(4, 8),
 
       # ── Panel izquierdo: controles ──
-      card(
-        card_header(tagList(bs_icon("folder2-open"), " Cargar datos")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
+        bslib::card_body(
           p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
             class = "text-muted small"),
           hr(),
@@ -39,21 +39,21 @@ mod_datos_ui <- function(id) {
       ),
 
       # ── Panel derecho: vista previa ──
-      card(
-        card_header("Vista previa de los datos"),
-        card_body(
+      bslib::card(
+        bslib::card_header("Vista previa de los datos"),
+        bslib::card_body(
           uiOutput(ns("info_columnas")),
           hr(),
           accordion(
             open = FALSE,
             accordion_panel(
               "📖 ¿Qué tipos de variables existen?",
-              layout_columns(
+              bslib::layout_columns(
                 col_widths = c(6, 6),
                 # Numérica
-                card(
+                bslib::card(
                   class = "border-0 bg-light",
-                  card_body(
+                  bslib::card_body(
                     tags$span(
                       class = "badge mb-2",
                       style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
@@ -70,9 +70,9 @@ mod_datos_ui <- function(id) {
                   )
                 ),
                 # Categórica
-                card(
+                bslib::card(
                   class = "border-0 bg-light",
-                  card_body(
+                  bslib::card_body(
                     tags$span(
                       class = "badge mb-2",
                       style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
@@ -92,7 +92,7 @@ mod_datos_ui <- function(id) {
             )
           ),
           br(),
-          DTOutput(ns("tabla_preview"))
+          DT::DTOutput(ns("tabla_preview"))
         )
       )
     )
@@ -139,8 +139,8 @@ mod_datos_server <- function(id) {
     })
 
     # ── Tabla preview ──
-    output$tabla_preview <- renderDT({
-      datatable(
+    output$tabla_preview <- DT::renderDT({
+      DT::datatable(
         datos(),
         options = list(
           pageLength = 8,

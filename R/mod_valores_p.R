@@ -16,7 +16,7 @@ mod_valores_p_ui <- function(id) {
       style = paste0("border-bottom: 2px solid ", "#C8D9EC", ";"),
       tags$h4(
         style = paste0("color: #1170AA; font-weight: 700;"),
-        bs_icon("bar-chart-steps"), " ¿Qué es un valor de p?"
+        bsicons::bs_icon("bar-chart-steps"), " ¿Qué es un valor de p?"
       ),
       tags$p(
         class = "text-muted mb-0",
@@ -25,14 +25,14 @@ mod_valores_p_ui <- function(id) {
     ),
 
     # ── Fila 1: Cita + Intérprete interactivo ──
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(5, 7),
       gap = "1rem",
 
       # Cita
-      card(
-        card_header(tagList(bs_icon("quote"), " Para empezar")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("quote"), " Para empezar")),
+        bslib::card_body(
           tags$blockquote(
             class = "blockquote",
             style = paste0("border-left: 4px solid #1170AA; padding-left: 1rem;
@@ -61,15 +61,15 @@ mod_valores_p_ui <- function(id) {
       ),
 
       # Intérprete interactivo
-      card(
-        card_header(tagList(bs_icon("search"), " Interpretá tu valor de p")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("search"), " Interpretá tu valor de p")),
+        bslib::card_body(
           tags$p(
             class = "text-muted small",
             "Ingresá el valor de p de tu análisis y el tamaño del efecto para
             obtener una interpretación contextualizada."
           ),
-          layout_columns(
+          bslib::layout_columns(
             col_widths = c(6, 6),
             numericInput(
               ns("p_valor"),
@@ -107,13 +107,13 @@ mod_valores_p_ui <- function(id) {
     br(),
 
     # ── Fila 2: Definición y Historia ──
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(6, 6),
       gap = "1rem",
 
-      card(
-        card_header(tagList(bs_icon("info-circle"), " ¿Qué es realmente el valor de p?")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("info-circle"), " ¿Qué es realmente el valor de p?")),
+        bslib::card_body(
           tags$p(tags$strong("Definición correcta:")),
           div(
             style = paste0("background-color: #EEF3FA; border-left: 4px solid #1170AA;
@@ -147,9 +147,9 @@ mod_valores_p_ui <- function(id) {
         )
       ),
 
-      card(
-        card_header(tagList(bs_icon("clock-history"), " Breve historia")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("clock-history"), " Breve historia")),
+        bslib::card_body(
           div(
             style = "border-left: 3px solid #C8D9EC; padding-left: 1rem; margin-bottom: 1rem;",
             tags$p(tags$strong("R. A. Fisher (1935)"), class = "mb-1"),
@@ -187,10 +187,10 @@ mod_valores_p_ui <- function(id) {
     br(),
 
     # ── Fila 3: Mitos ──
-    card(
-      card_header(tagList(bs_icon("exclamation-triangle"), " Mitos más comunes")),
-      card_body(
-        layout_columns(
+    bslib::card(
+      bslib::card_header(tagList(bsicons::bs_icon("exclamation-triangle"), " Mitos más comunes")),
+      bslib::card_body(
+        bslib::layout_columns(
           col_widths = c(6, 6),
           gap = "1rem",
 
@@ -213,13 +213,13 @@ mod_valores_p_ui <- function(id) {
     br(),
 
     # ── Fila 4: Problemas y Alternativas ──
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(5, 7),
       gap = "1rem",
 
-      card(
-        card_header(tagList(bs_icon("bug"), " Problemas del uso del p")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("bug"), " Problemas del uso del p")),
+        bslib::card_body(
           problema_item("Dicotomía significativo / no significativo",
                         "Se interpreta el p < 0.05 como un sí/no absoluto, cuando refleja un grado de evidencia."),
           problema_item("P-hacking",
@@ -234,9 +234,9 @@ mod_valores_p_ui <- function(id) {
         )
       ),
 
-      card(
-        card_header(tagList(bs_icon("lightbulb"), " Alternativas y buenas prácticas")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("lightbulb"), " Alternativas y buenas prácticas")),
+        bslib::card_body(
           tags$h6(tags$strong("1. Reportar tamaños del efecto con IC 95%"), class = "text-primary"),
           tags$p(
             class = "small mb-3",
@@ -278,12 +278,12 @@ mod_valores_p_ui <- function(id) {
     br(),
 
     # ── Referencia ──
-    card(
-      card_body(
+    bslib::card(
+      bslib::card_body(
         class = "py-2",
         tags$p(
           class = "text-muted small mb-0",
-          bs_icon("book"), " ",
+          bsicons::bs_icon("book"), " ",
           tags$strong("Referencia: "),
           "Spínola, M. (2025). Prácticamente insignificante. Blog sobre Ciencia de Datos. ICOMVIS, Universidad Nacional, Costa Rica."
         )
@@ -294,8 +294,8 @@ mod_valores_p_ui <- function(id) {
 
 # ── Helpers de UI ────────────────────────────────────────────
 mito_card <- function(titulo, mito, realidad) {
-  card(
-    card_body(
+  bslib::card(
+    bslib::card_body(
       tags$p(
         tags$span(class = "badge",
                   style = "background-color: #C85200; color: white;",
@@ -340,12 +340,12 @@ mod_valores_p_server <- function(id) {
         # Veredicto principal
         veredicto <- if (sig) {
           div(class = "alert alert-success small mb-2",
-              bs_icon("check-circle"), " ",
+              bsicons::bs_icon("check-circle"), " ",
               tags$strong(paste0("p = ", p_label, " es menor que α = ", alpha, ".")),
               " Hay evidencia estadística suficiente para rechazar la hipótesis nula.")
         } else {
           div(class = "alert alert-warning small mb-2",
-              bs_icon("exclamation-circle"), " ",
+              bsicons::bs_icon("exclamation-circle"), " ",
               tags$strong(paste0("p = ", p_label, " es mayor o igual que α = ", alpha, ".")),
               " No hay evidencia estadística suficiente para rechazar la hipótesis nula.")
         }

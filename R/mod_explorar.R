@@ -5,13 +5,13 @@
 mod_explorar_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    layout_columns(
+    bslib::layout_columns(
       col_widths = c(3, 9),
 
       # ── Controles ──
-      card(
-        card_header(tagList(bs_icon("search"), " Opciones")),
-        card_body(
+      bslib::card(
+        bslib::card_header(tagList(bsicons::bs_icon("search"), " Opciones")),
+        bslib::card_body(
           uiOutput(ns("sel_variable")),
           hr(),
           p("Selecciona una variable para ver su resumen descriptivo completo.",
@@ -31,9 +31,9 @@ mod_explorar_ui <- function(id) {
       ),
 
       # ── Resultados ──
-      card(
-        card_header("Resumen descriptivo"),
-        card_body(
+      bslib::card(
+        bslib::card_header("Resumen descriptivo"),
+        bslib::card_body(
           uiOutput(ns("tipo_badge")),
           br(),
 
@@ -41,47 +41,47 @@ mod_explorar_ui <- function(id) {
           conditionalPanel(
             condition = sprintf("output['%s'] == 'Numérica'", ns("tipo_var")),
 
-            layout_columns(
+            bslib::layout_columns(
               col_widths = c(6, 6),
               gap = "1rem",
 
               # Fila 1
-              card(
-                card_header(tagList(bs_icon("bullseye"), " Tendencia central")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("bullseye"), " Tendencia central")),
+                bslib::card_body(
                   p("Indican dónde se concentran los datos.", class = "text-muted small"),
                   tableOutput(ns("tabla_central"))
                 )
               ),
-              card(
-                card_header(tagList(bs_icon("arrows-expand"), " Dispersión")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("arrows-expand"), " Dispersión")),
+                bslib::card_body(
                   p("Indican qué tan dispersos o concentrados están los datos.", class = "text-muted small"),
                   tableOutput(ns("tabla_dispersion"))
                 )
               ),
 
               # Fila 2
-              card(
-                card_header(tagList(bs_icon("activity"), " Forma de la distribución")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("activity"), " Forma de la distribución")),
+                bslib::card_body(
                   p("Describen la simetría y el peso de las colas.", class = "text-muted small"),
                   tableOutput(ns("tabla_forma"))
                 )
               ),
-              card(
-                card_header(tagList(bs_icon("exclamation-triangle"), " Valores extremos")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("exclamation-triangle"), " Valores extremos")),
+                bslib::card_body(
                   p("Mínimo, máximo y posibles valores atípicos (outliers).", class = "text-muted small"),
                   tableOutput(ns("tabla_extremos"))
                 )
               ),
 
               # Fila 3 — valores perdidos ocupa ambas columnas
-              card(
+              bslib::card(
                 col_width = 12,
-                card_header(tagList(bs_icon("question-circle"), " Valores perdidos")),
-                card_body(
+                bslib::card_header(tagList(bsicons::bs_icon("question-circle"), " Valores perdidos")),
+                bslib::card_body(
                   tableOutput(ns("tabla_na"))
                 )
               )
@@ -92,21 +92,21 @@ mod_explorar_ui <- function(id) {
           conditionalPanel(
             condition = sprintf("output['%s'] == 'Categórica'", ns("tipo_var")),
 
-            layout_columns(
+            bslib::layout_columns(
               col_widths = c(6, 6),
               gap = "1rem",
 
-              card(
-                card_header(tagList(bs_icon("bar-chart"), " Tabla de frecuencias")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("bar-chart"), " Tabla de frecuencias")),
+                bslib::card_body(
                   p("Muestra cuántas veces aparece cada categoría y su proporción.", class = "text-muted small"),
                   tableOutput(ns("tabla_frecuencias"))
                 )
               ),
 
-              card(
-                card_header(tagList(bs_icon("list-ul"), " Resumen")),
-                card_body(
+              bslib::card(
+                bslib::card_header(tagList(bsicons::bs_icon("list-ul"), " Resumen")),
+                bslib::card_body(
                   tableOutput(ns("tabla_cat_resumen"))
                 )
               )
@@ -119,7 +119,7 @@ mod_explorar_ui <- function(id) {
           accordion(
             open = FALSE,
             accordion_panel(
-              title = tagList(bs_icon("code-slash"), " Código R reproducible"),
+              title = tagList(bsicons::bs_icon("code-slash"), " Código R reproducible"),
               value = "codigo_r",
               p(
                 "Script que reproduce este análisis descriptivo con tus datos.",
@@ -129,7 +129,7 @@ mod_explorar_ui <- function(id) {
               downloadButton(
                 ns("descargar_script"),
                 label = "Descargar .R",
-                icon  = bs_icon("download"),
+                icon  = bsicons::bs_icon("download"),
                 class = "btn-sm btn-outline-primary mt-2"
               )
             )

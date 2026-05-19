@@ -1,23 +1,30 @@
-#' Run the StatFlow Shiny Application
+#' Run the Shiny Application
 #'
-#' @description Launches the StatFlow interactive introductory data analysis
-#'   platform in your default web browser.
-#'
-#' @param ... Arguments passed to \code{\link[golem]{with_golem_options}}.
-#'
-#' @return No return value, called for side effects.
-#'
-#' @examples
-#' \dontrun{
-#'   StatFlow::run_app()
-#' }
+#' @param ... arguments to pass to golem_opts.
+#' @inheritParams shiny::shinyApp
 #'
 #' @export
-run_app <- function(...) {
-  golem::with_golem_options(
-    app = shiny::shinyApp(
-      ui     = app_ui(),
-      server = app_server
+#' @importFrom shiny shinyApp
+#' @importFrom golem with_golem_options
+#' @import bslib
+#' @import shiny
+#' @import bsicons
+#' @import shinyjs
+run_app <- function(
+  onStart = NULL,
+  options = list(),
+  enableBookmarking = NULL,
+  uiPattern = "/",
+  ...
+) {
+  with_golem_options(
+    app = shinyApp(
+      ui     = app_ui,
+      server = app_server,
+      onStart = onStart,
+      options = options,
+      enableBookmarking = enableBookmarking,
+      uiPattern = uiPattern
     ),
     golem_opts = list(...)
   )

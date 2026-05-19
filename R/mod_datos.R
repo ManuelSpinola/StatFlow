@@ -115,7 +115,7 @@ mod_datos_server <- function(id) {
       }
 
       # Convertir character a factor
-      df |> mutate(across(where(is.character), as.factor))
+      df |> dplyr::mutate(across(where(is.character), as.factor))
     })
 
     # ── Info de columnas ──

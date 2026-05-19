@@ -283,13 +283,13 @@ mod_explorar_server <- function(id, datos) {
       req(tipo_actual() == "Categórica")
       x  <- var_activa()
       as.data.frame(table(x)) %>%
-        rename(Categoría = x, Frecuencia = Freq) %>%
-        mutate(
+        dplyr::rename(Categoría = x, Frecuencia = Freq) %>%
+        dplyr::mutate(
           Porcentaje        = paste0(round(Frecuencia / sum(Frecuencia) * 100, 1), " %"),
           `Frec. acumulada` = cumsum(Frecuencia),
           `% acumulado`     = paste0(round(cumsum(Frecuencia) / sum(Frecuencia) * 100, 1), " %")
         ) %>%
-        arrange(desc(Frecuencia))
+        dplyr::arrange(desc(Frecuencia))
     }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
     # ── Resumen categórica ──
@@ -361,9 +361,9 @@ mod_explorar_server <- function(id, datos) {
           "tabla[order(-tabla$Freq), ]\n\n",
           "# ── Con tidyverse ──\n",
           "datos |>\n",
-          "  count(`", var, "`) |>\n",
-          "  mutate(pct = round(n / sum(n) * 100, 1)) |>\n",
-          "  arrange(desc(n))\n"
+          "  dplyr::count(`", var, "`) |>\n",
+          "  dplyr::mutate(pct = round(n / sum(n) * 100, 1)) |>\n",
+          "  dplyr::arrange(desc(n))\n"
         )
       }
 

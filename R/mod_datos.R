@@ -18,10 +18,12 @@ mod_datos_ui <- function(id) {
           radioButtons(
             ns("fuente"), "¿De dónde vienen los datos?",
             choices = c(
-              "Subir mi archivo"     = "subir",
-              "Datos de ejemplo: Fauna"     = "fauna",
-              "Datos de ejemplo: Árboles"   = "arboles",
-              "Datos de ejemplo: Cobertura" = "cobertura"
+              "Subir mi archivo"                        = "subir",
+              "Datos de ejemplo: Fauna"                 = "fauna",
+              "Datos de ejemplo: Árboles"               = "arboles",
+              "Datos de ejemplo: Cobertura"             = "cobertura",
+              "Datos de ejemplo: Pingüinos"             = "penguins",
+              "Datos de ejemplo: Salud materno-infantil" = "birthwt"
             ),
             selected = "fauna"
           ),

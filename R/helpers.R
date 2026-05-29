@@ -116,44 +116,15 @@ resumen_numerico <- function(df, col) {
 }
 
 # ── Datasets de ejemplo ────────────────────────────────────
-set.seed(42)
+# Los datos se generan en data-raw/crear_datos.R y se cargan
+# desde data/ como archivos .rds (más rápido, sin dependencias).
 
 datos_ejemplo <- list(
-  fauna = {
-    # Pesos realistas por especie (Costa Rica)
-    # Danta (Tapirus bairdii): 150-300 kg
-    # Puma (Puma concolor): 40-80 kg
-    # Tepezcuintle (Cuniculus paca): 6-12 kg
-    # Pizote (Nasua narica): 3-6 kg
-    n_por_especie <- 15
-    tibble(
-      especie = rep(c("Danta", "Puma", "Tepezcuintle", "Pizote"), each = n_por_especie),
-      zona    = sample(c("Norte", "Sur", "Este"), n_por_especie * 4, replace = TRUE),
-      peso_kg = round(c(
-        rnorm(n_por_especie, mean = 220, sd = 25),   # Danta
-        rnorm(n_por_especie, mean = 58,  sd = 8),    # Puma
-        rnorm(n_por_especie, mean = 8.5, sd = 1.2),  # Tepezcuintle
-        rnorm(n_por_especie, mean = 4.2, sd = 0.6)   # Pizote
-      ), 1),
-      avistamientos = sample(1:15, n_por_especie * 4, replace = TRUE),
-      mes           = sample(month.name[1:6], n_por_especie * 4, replace = TRUE)
-    )
-  },
-  arboles = tibble(
-    especie   = sample(c("Ceibo", "Guanacaste", "Pochote", "Cristóbal"), 50, replace = TRUE),
-    parcela   = sample(paste("Parcela", 1:5), 50, replace = TRUE),
-    dap_cm    = round(rnorm(50, 45, 15), 1),
-    altura_m  = round(rnorm(50, 18, 5), 1),
-    cobertura = round(runif(50, 10, 95), 1)
-  ),
-  cobertura = tibble(
-    tipo_cobertura = sample(c("Bosque primario", "Bosque secundario",
-                              "Pastizal", "Matorral"), 48, replace = TRUE),
-    sector         = sample(c("Sector A", "Sector B", "Sector C"), 48, replace = TRUE),
-    area_ha        = round(runif(48, 0.5, 25), 2),
-    porcentaje     = round(runif(48, 5, 90), 1),
-    anio           = sample(2020:2024, 48, replace = TRUE)
-  )
+  fauna     = readRDS("inst/app/data/fauna.rds"),
+  arboles   = readRDS("inst/app/data/arboles.rds"),
+  cobertura = readRDS("inst/app/data/cobertura.rds"),
+  penguins  = readRDS("inst/app/data/penguins.rds"),
+  birthwt   = readRDS("inst/app/data/birthwt.rds")
 )
 
 # ── Código R reproducible: encabezado estándar ────────────

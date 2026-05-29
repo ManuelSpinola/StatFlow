@@ -36,7 +36,8 @@ mod_datos_ui <- function(id) {
               placeholder = "Selecciona un archivo...",
               buttonLabel = "Buscar archivo"
             )
-          )
+          ),
+          uiOutput(ns("info_dataset"))
         )
       ),
 
@@ -118,6 +119,68 @@ mod_datos_server <- function(id) {
 
       # Convertir character a factor
       df |> mutate(across(where(is.character), as.factor))
+    })
+
+    # ── Info del dataset seleccionado ──
+    output$info_dataset <- renderUI({
+      fuente <- input$fuente
+      if (fuente == "fauna") {
+        div(class = "alert alert-info small py-2 px-3 mt-2 mb-0",
+          bsicons::bs_icon("info-circle-fill", class = "me-1"),
+          strong("Dataset: Fauna silvestre — Costa Rica."),
+          " Registros simulados de ",
+          strong("4 especies de mamíferos"),
+          " (Danta, Puma, Tepezcuintle, Pizote) en tres zonas del país. Variables: ",
+          strong("especie"), ", ", strong("zona"), ", ",
+          strong("peso_kg"), ", ", strong("avistamientos"), " y ", strong("mes"), "."
+        )
+      } else if (fuente == "arboles") {
+        div(class = "alert alert-info small py-2 px-3 mt-2 mb-0",
+          bsicons::bs_icon("info-circle-fill", class = "me-1"),
+          strong("Dataset: Árboles tropicales."),
+          " Registros simulados de ",
+          strong("50 árboles"),
+          " de 4 especies en 5 parcelas. Variables: ",
+          strong("especie"), ", ", strong("parcela"), ", ",
+          strong("dap_cm"), " (diámetro a la altura del pecho), ",
+          strong("altura_m"), " y ", strong("cobertura"), " (%)."
+        )
+      } else if (fuente == "cobertura") {
+        div(class = "alert alert-info small py-2 px-3 mt-2 mb-0",
+          bsicons::bs_icon("info-circle-fill", class = "me-1"),
+          strong("Dataset: Cobertura del suelo."),
+          " Registros simulados de ",
+          strong("48 parcelas"),
+          " clasificadas por tipo de cobertura y sector. Variables: ",
+          strong("tipo_cobertura"), ", ", strong("sector"), ", ",
+          strong("area_ha"), ", ", strong("porcentaje"), " y ", strong("anio"), "."
+        )
+      } else if (fuente == "penguins") {
+        div(class = "alert alert-info small py-2 px-3 mt-2 mb-0",
+          bsicons::bs_icon("info-circle-fill", class = "me-1"),
+          strong("Dataset: Pingüinos de Palmer."),
+          " Mediciones de ",
+          strong("344 pingüinos"),
+          " de 3 especies (Adélie, Chinstrap, Gentoo) en el archipiélago de Palmer, Antártida. Variables: ",
+          strong("species"), ", ", strong("island"), ", ",
+          strong("bill_length_mm"), ", ", strong("bill_depth_mm"), ", ",
+          strong("flipper_length_mm"), ", ", strong("body_mass_g"), " y ", strong("sex"), ". ",
+          "Fuente: Horst, Hill & Gorman (2020)."
+        )
+      } else if (fuente == "birthwt") {
+        div(class = "alert alert-info small py-2 px-3 mt-2 mb-0",
+          bsicons::bs_icon("info-circle-fill", class = "me-1"),
+          strong("Dataset: Salud materno-infantil (Hosmer & Lemeshow)."),
+          " Datos de ",
+          strong("189 neonatos"),
+          " del Baystate Medical Center, Springfield, MA (1986). Variables: ",
+          strong("bwt"), " (peso al nacer en gramos), ",
+          strong("age"), " (edad de la madre), ",
+          strong("lwt"), " (peso de la madre en libras), ",
+          strong("race"), ", ", strong("smoke"), ", ", strong("ht"), " y ", strong("ui"), ". ",
+          "Fuente: MASS::birthwt."
+        )
+      }
     })
 
     # ── Info de columnas ──

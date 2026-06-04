@@ -268,6 +268,50 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
+    "StatFlow": {
+      "Package": "StatFlow",
+      "Version": "1.0.0",
+      "Source": "GitHub",
+      "Title": "Interactive Introductory Data Analysis Platform",
+      "Authors@R": "person(\"Manuel\", \"Spínola\",  email = \"manuel.spinola@una.ac.cr\", role  = c(\"aut\", \"cre\"), comment = c(ORCID = \"\"))",
+      "Description": "A Shiny-based interactive platform for introductory data analysis, part of the StatSuite ecosystem. Includes modules for data loading, exploration, graphics, comparing means and frequencies, correlation, and understanding p-values. Designed for teaching and research in ecology and biodiversity sciences.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
+      "Imports": [
+        "shiny (>= 1.8.0)",
+        "bslib (>= 0.7.0)",
+        "bsicons",
+        "shinyjs",
+        "ggplot2",
+        "dplyr",
+        "tidyr",
+        "readr",
+        "readxl",
+        "golem",
+        "pkgload"
+      ],
+      "Suggests": [
+        "testthat (>= 3.0.0)"
+      ],
+      "Config/testthat/edition": "3",
+      "URL": "https://github.com/ManuelSpinola/StatFlow",
+      "BugReports": "https://github.com/ManuelSpinola/StatFlow/issues",
+      "Config/roxygen2/version": "8.0.0",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "StatFlow",
+      "RemoteUsername": "ManuelSpinola",
+      "RemotePkgRef": "ManuelSpinola/StatFlow",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "707306280e0ee44556ce9cf3d8e99c51df1c55bd",
+      "NeedsCompilation": "no",
+      "Author": "Manuel Spínola [aut, cre]",
+      "Maintainer": "Manuel Spínola <manuel.spinola@una.ac.cr>",
+      "Depends": [
+        "R (>= 4.1.0)"
+      ]
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.2.1",

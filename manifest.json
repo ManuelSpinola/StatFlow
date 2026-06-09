@@ -4753,13 +4753,16 @@
       "checksum": "a1ac6ff5fd93c728e9f7552fd371ba8e"
     },
     ".Rprofile": {
-      "checksum": "af5c54e6cd177e1e2903742432972cd9"
+      "checksum": "faf6379ac7dc717e2396876e3ba60cff"
     },
     "app.R": {
       "checksum": "229c5f7fb8cc2fa81ab3d65ce1848792"
     },
-    "DESCRIPTION.bak": {
+    "DESCRIPTION": {
       "checksum": "5bad486fe40ecff275fbd310ece5d052"
+    },
+    "dev/run_dev.R": {
+      "checksum": "af416ea1d16f8c4576bfde3af996ce20"
     },
     "inst/app/data-raw/crear_datos.R": {
       "checksum": "caaa19b177787a272ef811dd5ef8fe5b"
@@ -4787,6 +4790,12 @@
     },
     "inst/golem-config.yml": {
       "checksum": "d1c4c300661e5a2273062fd263f29b12"
+    },
+    "LICENSE": {
+      "checksum": "81d4cb29962f81f98e5691f6363640ea"
+    },
+    "man/run_app.Rd": {
+      "checksum": "f890e02954c95581171e4bdd9d6888b1"
     },
     "NAMESPACE": {
       "checksum": "1518cf333160f810c81d8e907c6ed9cc"
@@ -4841,6 +4850,9 @@
     },
     "R/run_app.R": {
       "checksum": "89936b4b30f6f2ec43d6f38e9047ef31"
+    },
+    "README.md": {
+      "checksum": "9fb3f9167fdcc65b4524aae3203d9562"
     },
     "renv.lock": {
       "checksum": "e33749bfa89c6d1c260903224e0a5216"

@@ -75,22 +75,28 @@ tema_app <- bs_theme(
     border: none;
     font-weight: 600;
   }
-  .nav-tabs .nav-link:hover {
-    border: none;
-    color: #0c3a5c;
-  }
-  .nav-tabs .nav-link.active {
+  .nav-tabs .nav-link.active,
+  .nav-tabs .nav-item .nav-link.active,
+  ul.nav.nav-tabs li.nav-item a.nav-link.active {
     background-color: #1170AA !important;
     color: #ffffff !important;
-    border: none !important;
-    border-radius: 8px 8px 0 0 !important;
-    font-weight: 700;
+    border-top-color: #1170AA !important;
+    border-left-color: #1170AA !important;
+    border-right-color: #1170AA !important;
+    border-bottom-color: transparent !important;
+    font-weight: 600 !important;
+  }
+  .nav-tabs .nav-link:not(.active):hover {
+    background-color: #EEF3FA !important;
+    color: #1170AA !important;
   }
 
   .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
   .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
   .card > .card-header { background-color: #5FA2CE; color: #ffffff; font-weight: 700;
                          border-bottom: none; }
+  .card > .card-header:has(.nav-tabs) { background-color: transparent; color: inherit;
+                                        border-bottom: revert; }
 ")
 
 # ── Escala de color para gráficos (ggplot2) ───────────────

@@ -12,9 +12,11 @@ mod_datos_ui <- function(id) {
   tagList(
     bslib::layout_columns(
       col_widths = c(4, 8),
+      fill = FALSE,
 
       # ── Panel izquierdo: controles ──
       bslib::card(
+        fill = FALSE,
         bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
         bslib::card_body(
           p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
@@ -48,6 +50,7 @@ mod_datos_ui <- function(id) {
 
       # ── Panel derecho: vista previa ──
       bslib::card(
+        fill = FALSE,
         bslib::card_header("Vista previa de los datos"),
         bslib::card_body(
           uiOutput(ns("info_columnas")),
@@ -58,7 +61,9 @@ mod_datos_ui <- function(id) {
               "📖 ¿Qué tipos de variables existen?",
               bslib::layout_columns(
                 col_widths = c(6, 6),
+                fill = FALSE,
                 bslib::card(
+                  fill = FALSE,
                   class = "border-0 bg-light",
                   bslib::card_body(
                     tags$span(class = "badge mb-2",
@@ -74,6 +79,7 @@ mod_datos_ui <- function(id) {
                   )
                 ),
                 bslib::card(
+                  fill = FALSE,
                   class = "border-0 bg-light",
                   bslib::card_body(
                     tags$span(class = "badge mb-2",
@@ -100,6 +106,7 @@ mod_datos_ui <- function(id) {
     # ── Card de Variables (debajo del layout principal) ──
     br(),
     bslib::card(
+      fill = FALSE,
       bslib::card_header(tagList(bsicons::bs_icon("sliders"), " Ajustar tipos de variables")),
       bslib::card_body(
         p(class = "text-muted small mb-3",
@@ -118,6 +125,7 @@ mod_datos_ui <- function(id) {
           fill = FALSE,
 
           bslib::card(
+            fill = FALSE,
             bslib::card_header(bsicons::bs_icon("book", class = "me-1"), "Tipos de variables"),
             bslib::card_body(
               tags$ul(class = "small mb-0",

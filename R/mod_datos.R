@@ -30,32 +30,37 @@ mod_datos_ui <- function(id) {
               fill = FALSE,
               bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
               bslib::card_body(
-                p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
-                  class = "text-muted small"),
-                hr(),
+                p(class = "fw-bold mb-2",
+                  style = paste0("color:", colores$primario, ";"),
+                  bsicons::bs_icon("database", class = "me-1"), "Datos de ejemplo"),
                 radioButtons(
-                  ns("fuente"), "¿De dónde vienen los datos?",
+                  ns("fuente"), label = NULL,
                   choices = c(
-                    "Subir mi archivo"                         = "subir",
-                    "Datos de ejemplo: Fauna"                  = "fauna",
-                    "Datos de ejemplo: Árboles"                = "arboles",
-                    "Datos de ejemplo: Cobertura"              = "cobertura",
-                    "Datos de ejemplo: Pingüinos"              = "penguins",
-                    "Datos de ejemplo: Salud materno-infantil" = "birthwt"
+                    "Fauna"                     = "fauna",
+                    "Árboles"                   = "arboles",
+                    "Cobertura"                 = "cobertura",
+                    "Pingüinos"                 = "penguins",
+                    "Salud materno-infantil"    = "birthwt"
                   ),
                   selected = "fauna"
                 ),
-                conditionalPanel(
-                  condition = sprintf("input['%s'] == 'subir'", ns("fuente")),
-                  fileInput(
-                    ns("archivo"),
-                    label       = NULL,
-                    accept      = c(".csv", ".xlsx", ".xls"),
-                    placeholder = "Selecciona un archivo...",
-                    buttonLabel = "Buscar archivo"
-                  )
-                ),
-                uiOutput(ns("info_dataset"))
+                uiOutput(ns("info_dataset")),
+
+                hr(),
+
+                p(class = "fw-bold mb-1",
+                  style = paste0("color:", colores$primario, ";"),
+                  bsicons::bs_icon("upload", class = "me-1"), "Subir tus propios datos"),
+                p(class = "text-muted small mb-2",
+                  "Podés cargar archivos en formato ",
+                  strong("CSV"), " o ", strong("Excel (.xlsx, .xls)"), "."),
+                fileInput(
+                  ns("archivo"),
+                  label       = NULL,
+                  accept      = c(".csv", ".xlsx", ".xls"),
+                  placeholder = "Selecciona un archivo...",
+                  buttonLabel = "Buscar archivo"
+                )
               )
             ),
 
@@ -183,7 +188,7 @@ mod_datos_server <- function(id) {
 
     # ── Datos crudos ─────────────────────────────────────────────────────────
     datos <- reactive({
-      if (input$fuente == "subir") {
+      if (!is.null(input$archivo)) {
         req(input$archivo)
         ext <- tolower(tools::file_ext(input$archivo$name))
         df  <- leer_archivo(input$archivo$datapath, ext)
@@ -238,7 +243,7 @@ mod_datos_server <- function(id) {
 
     # ── Info del dataset ─────────────────────────────────────────────────────
     output$info_dataset <- renderUI({
-      if (input$fuente == "subir") return(NULL)
+      if (!is.null(input$archivo)) return(NULL)
       info <- list(
         fauna     = list(titulo = "Fauna silvestre — Costa Rica",
                          desc   = "Registros simulados de 4 especies de mamíferos en tres zonas del país.",

@@ -66,6 +66,27 @@ tema_app <- bs_theme(
                   padding-top: 0 !important; padding-bottom: 0 !important; }
   .navbar .nav-link { color: #ffffff !important; }
   .navbar .nav-link.active { border-bottom: 2px solid #FC7D0B; }
+
+  /* Tabs internos (navset_card_tab) — estilo de píldora rellena,
+     consistente con StatBasics y StatPlot */
+  .nav-tabs { border-bottom: 1px solid #C8D9EC; }
+  .nav-tabs .nav-link {
+    color: #1170AA;
+    border: none;
+    font-weight: 600;
+  }
+  .nav-tabs .nav-link:hover {
+    border: none;
+    color: #0c3a5c;
+  }
+  .nav-tabs .nav-link.active {
+    background-color: #1170AA !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 700;
+  }
+
   .btn-primary { background-color: #FC7D0B; border-color: #FC7D0B; color: #ffffff; }
   .btn-primary:hover { background-color: #d4680a; border-color: #d4680a; }
   .card > .card-header { background-color: #5FA2CE; color: #ffffff; font-weight: 700;

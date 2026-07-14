@@ -9,152 +9,169 @@
 
 mod_datos_ui <- function(id) {
   ns <- NS(id)
+
   tagList(
-    bslib::layout_columns(
-      col_widths = c(4, 8),
-      fill = FALSE,
+    bslib::navset_card_tab(
 
-      # ── Panel izquierdo: controles ──
-      bslib::card(
-        fill = FALSE,
-        bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
+      # ══════════════════════════════════════════════════════
+      # PESTAÑA 1: Cargar datos
+      # ══════════════════════════════════════════════════════
+      bslib::nav_panel(
+        title    = tagList(bsicons::bs_icon("folder2-open", class = "me-1"), "Cargar datos"),
+        fillable = FALSE,
         bslib::card_body(
-          p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
-            class = "text-muted small"),
-          hr(),
-          radioButtons(
-            ns("fuente"), "¿De dónde vienen los datos?",
-            choices = c(
-              "Subir mi archivo"                         = "subir",
-              "Datos de ejemplo: Fauna"                  = "fauna",
-              "Datos de ejemplo: Árboles"                = "arboles",
-              "Datos de ejemplo: Cobertura"              = "cobertura",
-              "Datos de ejemplo: Pingüinos"              = "penguins",
-              "Datos de ejemplo: Salud materno-infantil" = "birthwt"
+
+          bslib::layout_columns(
+            col_widths = c(4, 8),
+            fill       = FALSE,
+
+            # ── Panel izquierdo: controles ──
+            bslib::card(
+              fill = FALSE,
+              bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
+              bslib::card_body(
+                p("Sube tu archivo de Excel o CSV, o elige uno de los ejemplos para practicar.",
+                  class = "text-muted small"),
+                hr(),
+                radioButtons(
+                  ns("fuente"), "¿De dónde vienen los datos?",
+                  choices = c(
+                    "Subir mi archivo"                         = "subir",
+                    "Datos de ejemplo: Fauna"                  = "fauna",
+                    "Datos de ejemplo: Árboles"                = "arboles",
+                    "Datos de ejemplo: Cobertura"              = "cobertura",
+                    "Datos de ejemplo: Pingüinos"              = "penguins",
+                    "Datos de ejemplo: Salud materno-infantil" = "birthwt"
+                  ),
+                  selected = "fauna"
+                ),
+                conditionalPanel(
+                  condition = sprintf("input['%s'] == 'subir'", ns("fuente")),
+                  fileInput(
+                    ns("archivo"),
+                    label       = NULL,
+                    accept      = c(".csv", ".xlsx", ".xls"),
+                    placeholder = "Selecciona un archivo...",
+                    buttonLabel = "Buscar archivo"
+                  )
+                ),
+                uiOutput(ns("info_dataset"))
+              )
             ),
-            selected = "fauna"
-          ),
-          conditionalPanel(
-            condition = sprintf("input['%s'] == 'subir'", ns("fuente")),
-            fileInput(
-              ns("archivo"),
-              label       = NULL,
-              accept      = c(".csv", ".xlsx", ".xls"),
-              placeholder = "Selecciona un archivo...",
-              buttonLabel = "Buscar archivo"
-            )
-          ),
-          uiOutput(ns("info_dataset"))
-        )
-      ),
 
-      # ── Panel derecho: vista previa ──
-      bslib::card(
-        fill = FALSE,
-        bslib::card_header("Vista previa de los datos"),
+            # ── Panel derecho: vista previa ──
+            bslib::card(
+              fill = FALSE,
+              bslib::card_header("Vista previa de los datos"),
+              bslib::card_body(
+                uiOutput(ns("info_columnas")),
+                hr(),
+                accordion(
+                  open = FALSE,
+                  accordion_panel(
+                    "📖 ¿Qué tipos de variables existen?",
+                    bslib::layout_columns(
+                      col_widths = c(6, 6),
+                      fill       = FALSE,
+                      bslib::card(
+                        fill  = FALSE,
+                        class = "border-0 bg-light",
+                        bslib::card_body(
+                          tags$span(class = "badge mb-2",
+                                    style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
+                                    "Numérica"),
+                          p("Representa cantidades medibles.", class = "small mb-2"),
+                          tags$ul(class = "small mb-0",
+                            tags$li(tags$strong("Discreta:"), " valores enteros contables. ",
+                                    tags$em("Ej: número de individuos, cantidad de huevos")),
+                            tags$li(tags$strong("Continua:"), " cualquier valor en un rango. ",
+                                    tags$em("Ej: peso, temperatura, altura"))
+                          )
+                        )
+                      ),
+                      bslib::card(
+                        fill  = FALSE,
+                        class = "border-0 bg-light",
+                        bslib::card_body(
+                          tags$span(class = "badge mb-2",
+                                    style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
+                                    "Categórica"),
+                          p("Representa grupos o etiquetas.", class = "small mb-2"),
+                          tags$ul(class = "small mb-0",
+                            tags$li(tags$strong("Nominal:"), " sin orden entre categorías. ",
+                                    tags$em("Ej: especie, color, sexo")),
+                            tags$li(tags$strong("Ordinal:"), " con orden definido. ",
+                                    tags$em("Ej: nivel educativo, intensidad del dolor"))
+                          )
+                        )
+                      )
+                    )
+                  )
+                ),
+                br(),
+                DT::DTOutput(ns("tabla_preview"))
+              )
+            )
+          )
+        )
+      ), # /PESTAÑA 1
+
+      # ══════════════════════════════════════════════════════
+      # PESTAÑA 2: Variables
+      # ══════════════════════════════════════════════════════
+      bslib::nav_panel(
+        title    = tagList(bsicons::bs_icon("sliders", class = "me-1"), "Variables"),
+        fillable = FALSE,
         bslib::card_body(
-          uiOutput(ns("info_columnas")),
-          hr(),
-          accordion(
-            open = FALSE,
-            accordion_panel(
-              "📖 ¿Qué tipos de variables existen?",
-              bslib::layout_columns(
-                col_widths = c(6, 6),
-                fill = FALSE,
-                bslib::card(
-                  fill = FALSE,
-                  class = "border-0 bg-light",
-                  bslib::card_body(
-                    tags$span(class = "badge mb-2",
-                              style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
+
+          p(class = "text-muted small mb-3",
+            bsicons::bs_icon("info-circle", class = "me-1"),
+            "Revisá el tipo detectado para cada variable y corregilo si es necesario. ",
+            "Variables mal tipificadas pueden causar errores al analizar. ",
+            "Podés también ", strong("excluir"), " variables que no necesitás."),
+
+          uiOutput(ns("tabla_tipos")),
+          uiOutput(ns("tipos_aplicados_msg")),
+
+          tags$hr(),
+
+          bslib::layout_columns(
+            col_widths = c(3, 9),
+            fill       = FALSE,
+
+            bslib::card(
+              fill = FALSE,
+              bslib::card_header(bsicons::bs_icon("book", class = "me-1"), "Tipos de variables"),
+              bslib::card_body(
+                tags$ul(class = "small mb-0",
+                  tags$li(
+                    tags$span(class = "badge me-1",
+                              style = paste0("background:", colores$primario),
                               "Numérica"),
-                    p("Representa cantidades medibles.", class = "small mb-2"),
-                    tags$ul(class = "small mb-0",
-                      tags$li(tags$strong("Discreta:"), " valores enteros contables. ",
-                              tags$em("Ej: número de individuos, cantidad de huevos")),
-                      tags$li(tags$strong("Continua:"), " cualquier valor en un rango. ",
-                              tags$em("Ej: peso, temperatura, altura"))
-                    )
-                  )
-                ),
-                bslib::card(
-                  fill = FALSE,
-                  class = "border-0 bg-light",
-                  bslib::card_body(
-                    tags$span(class = "badge mb-2",
-                              style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
-                              "Categórica"),
-                    p("Representa grupos o etiquetas.", class = "small mb-2"),
-                    tags$ul(class = "small mb-0",
-                      tags$li(tags$strong("Nominal:"), " sin orden entre categorías. ",
-                              tags$em("Ej: especie, color, sexo")),
-                      tags$li(tags$strong("Ordinal:"), " con orden definido. ",
-                              tags$em("Ej: nivel educativo, intensidad del dolor"))
-                    )
+                    " — valores continuos o discretos. Ej: peso, temperatura, conteos"
+                  ),
+                  tags$li(
+                    tags$span(class = "badge me-1",
+                              style = paste0("background:", colores$acento),
+                              "Factor"),
+                    " — grupos o etiquetas. Ej: especie, sexo, país, año categórico"
+                  ),
+                  tags$li(
+                    tags$span(class = "badge me-1",
+                              style = paste0("background:", colores$texto),
+                              "Excluir"),
+                    " — variable no se usará en los análisis"
                   )
                 )
               )
-            )
-          ),
-          br(),
-          DT::DTOutput(ns("tabla_preview"))
+            ),
+
+            div(uiOutput(ns("resumen_tipos")))
+          )
         )
-      )
-    ),
+      ) # /PESTAÑA 2
 
-    # ── Card de Variables (debajo del layout principal) ──
-    br(),
-    bslib::card(
-      fill = FALSE,
-      bslib::card_header(tagList(bsicons::bs_icon("sliders"), " Ajustar tipos de variables")),
-      bslib::card_body(
-        p(class = "text-muted small mb-3",
-          bsicons::bs_icon("info-circle", class = "me-1"),
-          "Revisá el tipo detectado para cada variable y corregilo si es necesario. ",
-          "Variables mal tipificadas pueden causar errores al analizar. ",
-          "Podés también ", strong("excluir"), " variables que no necesitás."),
-
-        uiOutput(ns("tabla_tipos")),
-        uiOutput(ns("tipos_aplicados_msg")),
-
-        tags$hr(),
-
-        bslib::layout_columns(
-          col_widths = c(3, 9),
-          fill = FALSE,
-
-          bslib::card(
-            fill = FALSE,
-            bslib::card_header(bsicons::bs_icon("book", class = "me-1"), "Tipos de variables"),
-            bslib::card_body(
-              tags$ul(class = "small mb-0",
-                tags$li(
-                  tags$span(class = "badge me-1",
-                            style = paste0("background:", colores$primario),
-                            "Numérica"),
-                  " — valores continuos o discretos. Ej: peso, temperatura, conteos"
-                ),
-                tags$li(
-                  tags$span(class = "badge me-1",
-                            style = paste0("background:", colores$acento),
-                            "Factor"),
-                  " — grupos o etiquetas. Ej: especie, sexo, país, año categórico"
-                ),
-                tags$li(
-                  tags$span(class = "badge me-1",
-                            style = paste0("background:", colores$texto),
-                            "Excluir"),
-                  " — variable no se usará en los análisis"
-                )
-              )
-            )
-          ),
-
-          div(uiOutput(ns("resumen_tipos")))
-        )
-      )
-    )
+    ) # /navset_card_tab
   )
 }
 

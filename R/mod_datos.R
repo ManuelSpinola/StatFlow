@@ -60,7 +60,19 @@ mod_datos_ui <- function(id) {
                   accept      = c(".csv", ".xlsx", ".xls"),
                   placeholder = "Selecciona un archivo...",
                   buttonLabel = "Buscar archivo"
-                )
+                ),
+
+                hr(),
+                radioButtons(
+                  ns("manejo_na"),
+                  label    = "Valores perdidos (NA)",
+                  choices  = c(
+                    "Conservar"              = "conservar",
+                    "Eliminar filas con NA"  = "eliminar"
+                  ),
+                  selected = "conservar"
+                ),
+                uiOutput(ns("na_info"))
               )
             ),
 
@@ -275,7 +287,7 @@ mod_datos_server <- function(id) {
 
     # ── Badges de variables ──────────────────────────────────────────────────
     output$info_columnas <- renderUI({
-      df <- datos_conv()
+      df <- datos_final()
       req(df)
       div(
         class = "d-flex flex-wrap gap-2 mb-2",
@@ -294,7 +306,7 @@ mod_datos_server <- function(id) {
     # ── Tabla preview ────────────────────────────────────────────────────────
     output$tabla_preview <- DT::renderDT({
       DT::datatable(
-        datos_conv(),
+        datos_final(),
         options = list(
           pageLength = 8,
           scrollX    = TRUE,
@@ -413,8 +425,38 @@ mod_datos_server <- function(id) {
       )
     })
 
-    # ── Devolver datos con tipos aplicados ───────────────────────────────────
-    return(datos_conv)
+    # ── Manejo de NAs ────────────────────────────────────────────────────────
+    datos_final <- reactive({
+      df <- datos_conv()
+      req(df)
+      if (isTRUE(input$manejo_na == "eliminar")) {
+        df <- tidyr::drop_na(df)
+      }
+      df
+    })
+
+    output$na_info <- renderUI({
+      df_orig  <- datos_conv()
+      df_final <- datos_final()
+      req(df_orig)
+      n_na <- sum(!stats::complete.cases(df_orig))
+      if (n_na == 0) return(
+        div(class = "alert alert-success small py-1 px-2 mt-2 mb-0",
+            bsicons::bs_icon("check-circle", class = "me-1"), "Sin valores perdidos.")
+      )
+      n_elim <- nrow(df_orig) - nrow(df_final)
+      if (input$manejo_na == "eliminar")
+        div(class = "alert alert-warning small py-1 px-2 mt-2 mb-0",
+            bsicons::bs_icon("exclamation-triangle", class = "me-1"),
+            paste0(n_elim, " fila(s) eliminadas. Quedan ", nrow(df_final), " filas."))
+      else
+        div(class = "alert alert-info small py-1 px-2 mt-2 mb-0",
+            bsicons::bs_icon("info-circle", class = "me-1"),
+            paste0(n_na, " fila(s) con NA. Podés eliminarlas arriba."))
+    })
+
+    # ── Devolver datos con tipos aplicados y NA gestionados ──────────────────
+    return(datos_final)
 
   })
 }

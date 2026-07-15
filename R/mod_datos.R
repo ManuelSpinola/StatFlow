@@ -14,10 +14,10 @@ mod_datos_ui <- function(id) {
     bslib::navset_card_tab(
 
       # ══════════════════════════════════════════════════════
-      # PESTAÑA 1: Cargar datos
+      # PESTAÑA 1: Datos de ejemplo
       # ══════════════════════════════════════════════════════
       bslib::nav_panel(
-        title    = tagList(bsicons::bs_icon("folder2-open", class = "me-1"), "Cargar datos"),
+        title    = tagList(bsicons::bs_icon("database", class = "me-1"), "Datos de ejemplo"),
         fillable = FALSE,
         bslib::card_body(
 
@@ -25,116 +25,124 @@ mod_datos_ui <- function(id) {
             col_widths = c(4, 8),
             fill       = FALSE,
 
-            # ── Panel izquierdo: controles ──
-            bslib::card(
-              fill = FALSE,
-              bslib::card_header(tagList(bsicons::bs_icon("folder2-open"), " Cargar datos")),
-              bslib::card_body(
-                p(class = "fw-bold mb-2",
-                  style = paste0("color:", colores$primario, ";"),
-                  bsicons::bs_icon("database", class = "me-1"), "Datos de ejemplo"),
-                radioButtons(
-                  ns("fuente"), label = NULL,
-                  choices = c(
-                    "Fauna"                     = "fauna",
-                    "Árboles"                   = "arboles",
-                    "Cobertura"                 = "cobertura",
-                    "Pingüinos"                 = "penguins",
-                    "Salud materno-infantil"    = "birthwt"
-                  ),
-                  selected = "fauna"
+            # ── Panel izquierdo: selector ──
+            div(
+              radioButtons(
+                ns("fuente"), label = NULL,
+                choices = c(
+                  "Fauna"                     = "fauna",
+                  "Árboles"                   = "arboles",
+                  "Cobertura"                 = "cobertura",
+                  "Pingüinos"                 = "penguins",
+                  "Salud materno-infantil"    = "birthwt"
                 ),
-                uiOutput(ns("info_dataset")),
-
-                hr(),
-
-                p(class = "fw-bold mb-1",
-                  style = paste0("color:", colores$primario, ";"),
-                  bsicons::bs_icon("upload", class = "me-1"), "Subir tus propios datos"),
-                p(class = "text-muted small mb-2",
-                  "Podés cargar archivos en formato ",
-                  strong("CSV"), " o ", strong("Excel (.xlsx, .xls)"), "."),
-                fileInput(
-                  ns("archivo"),
-                  label       = NULL,
-                  accept      = c(".csv", ".xlsx", ".xls"),
-                  placeholder = "Selecciona un archivo...",
-                  buttonLabel = "Buscar archivo"
-                ),
-
-                hr(),
-                radioButtons(
-                  ns("manejo_na"),
-                  label    = "Valores perdidos (NA)",
-                  choices  = c(
-                    "Conservar"              = "conservar",
-                    "Eliminar filas con NA"  = "eliminar"
-                  ),
-                  selected = "conservar"
-                ),
-                uiOutput(ns("na_info"))
-              )
+                selected = "fauna"
+              ),
+              uiOutput(ns("info_dataset"))
             ),
 
             # ── Panel derecho: vista previa ──
-            bslib::card(
-              fill = FALSE,
-              bslib::card_header("Vista previa de los datos"),
-              bslib::card_body(
-                uiOutput(ns("info_columnas")),
-                hr(),
-                accordion(
-                  open = FALSE,
-                  accordion_panel(
-                    "📖 ¿Qué tipos de variables existen?",
-                    bslib::layout_columns(
-                      col_widths = c(6, 6),
-                      fill       = FALSE,
-                      bslib::card(
-                        fill  = FALSE,
-                        class = "border-0 bg-light",
-                        bslib::card_body(
-                          tags$span(class = "badge mb-2",
-                                    style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
-                                    "Numérica"),
-                          p("Representa cantidades medibles.", class = "small mb-2"),
-                          tags$ul(class = "small mb-0",
-                            tags$li(tags$strong("Discreta:"), " valores enteros contables. ",
-                                    tags$em("Ej: número de individuos, cantidad de huevos")),
-                            tags$li(tags$strong("Continua:"), " cualquier valor en un rango. ",
-                                    tags$em("Ej: peso, temperatura, altura"))
-                          )
+            div(
+              uiOutput(ns("info_columnas")),
+              hr(),
+              accordion(
+                open = FALSE,
+                accordion_panel(
+                  "📖 ¿Qué tipos de variables existen?",
+                  bslib::layout_columns(
+                    col_widths = c(6, 6),
+                    fill       = FALSE,
+                    bslib::card(
+                      fill  = FALSE,
+                      class = "border-0 bg-light",
+                      bslib::card_body(
+                        tags$span(class = "badge mb-2",
+                                  style = paste0("background-color:", colores$primario, "; color:#ffffff;"),
+                                  "Numérica"),
+                        p("Representa cantidades medibles.", class = "small mb-2"),
+                        tags$ul(class = "small mb-0",
+                          tags$li(tags$strong("Discreta:"), " valores enteros contables. ",
+                                  tags$em("Ej: número de individuos, cantidad de huevos")),
+                          tags$li(tags$strong("Continua:"), " cualquier valor en un rango. ",
+                                  tags$em("Ej: peso, temperatura, altura"))
                         )
-                      ),
-                      bslib::card(
-                        fill  = FALSE,
-                        class = "border-0 bg-light",
-                        bslib::card_body(
-                          tags$span(class = "badge mb-2",
-                                    style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
-                                    "Categórica"),
-                          p("Representa grupos o etiquetas.", class = "small mb-2"),
-                          tags$ul(class = "small mb-0",
-                            tags$li(tags$strong("Nominal:"), " sin orden entre categorías. ",
-                                    tags$em("Ej: especie, color, sexo")),
-                            tags$li(tags$strong("Ordinal:"), " con orden definido. ",
-                                    tags$em("Ej: nivel educativo, intensidad del dolor"))
-                          )
+                      )
+                    ),
+                    bslib::card(
+                      fill  = FALSE,
+                      class = "border-0 bg-light",
+                      bslib::card_body(
+                        tags$span(class = "badge mb-2",
+                                  style = paste0("background-color:", colores$acento, "; color:#ffffff;"),
+                                  "Categórica"),
+                        p("Representa grupos o etiquetas.", class = "small mb-2"),
+                        tags$ul(class = "small mb-0",
+                          tags$li(tags$strong("Nominal:"), " sin orden entre categorías. ",
+                                  tags$em("Ej: especie, color, sexo")),
+                          tags$li(tags$strong("Ordinal:"), " con orden definido. ",
+                                  tags$em("Ej: nivel educativo, intensidad del dolor"))
                         )
                       )
                     )
                   )
-                ),
-                br(),
-                DT::DTOutput(ns("tabla_preview"))
-              )
+                )
+              ),
+              br(),
+              DT::DTOutput(ns("tabla_preview"))
             )
           )
         )
       ), # /PESTAÑA 1
 
       # ══════════════════════════════════════════════════════
-      # PESTAÑA 2: Variables
+      # PESTAÑA 2: Mis datos
+      # ══════════════════════════════════════════════════════
+      bslib::nav_panel(
+        title    = tagList(bsicons::bs_icon("upload", class = "me-1"), "Mis datos"),
+        fillable = FALSE,
+        bslib::card_body(
+
+          bslib::layout_columns(
+            col_widths = c(4, 8),
+            fill       = FALSE,
+
+            # ── Panel izquierdo: subir archivo ──
+            div(
+              p(class = "text-muted small mb-2",
+                "Podés cargar archivos en formato ",
+                strong("CSV"), " o ", strong("Excel (.xlsx, .xls)"), "."),
+              fileInput(
+                ns("archivo"),
+                label       = NULL,
+                accept      = c(".csv", ".xlsx", ".xls"),
+                placeholder = "Selecciona un archivo...",
+                buttonLabel = "Buscar archivo"
+              ),
+              selectInput(
+                ns("separador"),
+                label    = "Separador (CSV):",
+                choices  = c(
+                  "Coma (,)"         = ",",
+                  "Punto y coma (;)" = ";",
+                  "Tabulador"        = "\t"
+                ),
+                selected = ","
+              ),
+              uiOutput(ns("resumen_datos_propio"))
+            ),
+
+            # ── Panel derecho: vista previa de mis datos ──
+            div(
+              uiOutput(ns("cards_datos_propio")),
+              hr(),
+              DT::DTOutput(ns("tabla_preview_propio"))
+            )
+          )
+        )
+      ), # /PESTAÑA 2
+
+      # ══════════════════════════════════════════════════════
+      # PESTAÑA 3: Variables
       # ══════════════════════════════════════════════════════
       bslib::nav_panel(
         title    = tagList(bsicons::bs_icon("sliders", class = "me-1"), "Variables"),
@@ -149,6 +157,23 @@ mod_datos_ui <- function(id) {
 
           uiOutput(ns("tabla_tipos")),
           uiOutput(ns("tipos_aplicados_msg")),
+
+          tags$hr(),
+          bslib::layout_columns(
+            col_widths = c(4, 8),
+            fill       = FALSE,
+            radioButtons(
+              ns("manejo_na"),
+              label    = tagList(bsicons::bs_icon("exclamation-diamond", class = "me-1"),
+                                 "Valores perdidos (NA)"),
+              choices  = c(
+                "Conservar"              = "conservar",
+                "Eliminar filas con NA"  = "eliminar"
+              ),
+              selected = "conservar"
+            ),
+            uiOutput(ns("na_info"))
+          ),
 
           tags$hr(),
 
@@ -186,7 +211,7 @@ mod_datos_ui <- function(id) {
             div(uiOutput(ns("resumen_tipos")))
           )
         )
-      ) # /PESTAÑA 2
+      ) # /PESTAÑA 3
 
     ) # /navset_card_tab
   )
@@ -198,19 +223,76 @@ mod_datos_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # ── Datos crudos ─────────────────────────────────────────────────────────
+    # ── Datos de ejemplo (solo la fuente seleccionada) ───────────────────────
+    datos_ejemplo_actual <- reactive({
+      req(input$fuente)
+      datos_ejemplo[[input$fuente]] |>
+        dplyr::mutate(dplyr::across(where(is.character), as.factor))
+    })
+
+    # ── Datos propios (solo el archivo subido) ───────────────────────────────
+    datos_propio <- reactive({
+      req(input$archivo)
+      ext <- tolower(tools::file_ext(input$archivo$name))
+      df  <- leer_archivo(input$archivo$datapath, ext, sep = input$separador %||% ",")
+      validate(need(!is.null(df),
+                    "No se pudo leer el archivo. Verificá que sea CSV o Excel."))
+      df |> dplyr::mutate(dplyr::across(where(is.character), as.factor))
+    })
+
+    # ── Datos activos (unificados: prioriza archivo propio) ──────────────────
     datos <- reactive({
       if (!is.null(input$archivo)) {
-        req(input$archivo)
-        ext <- tolower(tools::file_ext(input$archivo$name))
-        df  <- leer_archivo(input$archivo$datapath, ext)
-        validate(need(!is.null(df),
-                      "No se pudo leer el archivo. Verificá que sea CSV o Excel."))
-        df |> dplyr::mutate(dplyr::across(where(is.character), as.factor))
+        datos_propio()
       } else {
-        datos_ejemplo[[input$fuente]] |>
-          dplyr::mutate(dplyr::across(where(is.character), as.factor))
+        datos_ejemplo_actual()
       }
+    })
+
+    # ── Vista previa de datos propios ────────────────────────────────────────
+    output$resumen_datos_propio <- renderUI({
+      req(datos_propio())
+      d <- datos_propio()
+      div(class = "small text-muted mt-2",
+          bsicons::bs_icon("check-circle-fill",
+                           style = paste0("color:", colores$exito), class = "me-1"),
+          paste0(nrow(d), " filas · ", ncol(d), " columnas"))
+    })
+
+    output$cards_datos_propio <- renderUI({
+      req(datos_propio())
+      d <- datos_propio()
+      div(
+        class = "d-flex flex-wrap gap-2 mb-2",
+        lapply(names(d), function(nm) {
+          tipo   <- tipo_variable(d[[nm]])
+          estilo <- if (tipo == "Numérica")
+            paste0("background-color:", colores$primario, "; color:#ffffff;")
+          else
+            paste0("background-color:", colores$acento, "; color:#ffffff;")
+          tags$span(class = "badge", style = estilo,
+                    paste0(nm, " (", tipo, ")"))
+        })
+      )
+    })
+
+    output$tabla_preview_propio <- DT::renderDT({
+      req(datos_propio())
+      DT::datatable(
+        datos_propio(),
+        options = list(
+          pageLength = 8,
+          scrollX    = TRUE,
+          language   = list(
+            search     = "Buscar:",
+            lengthMenu = "Mostrar _MENU_ filas",
+            info       = "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            paginate   = list(previous = "Anterior", `next` = "Siguiente")
+          )
+        ),
+        rownames = FALSE,
+        class    = "table table-sm table-hover"
+      )
     })
 
     # ── Tipos definidos por el usuario ───────────────────────────────────────
@@ -452,7 +534,7 @@ mod_datos_server <- function(id) {
       else
         div(class = "alert alert-info small py-1 px-2 mt-2 mb-0",
             bsicons::bs_icon("info-circle", class = "me-1"),
-            paste0(n_na, " fila(s) con NA. Podés eliminarlas arriba."))
+            paste0(n_na, " fila(s) con NA."))
     })
 
     # ── Devolver datos con tipos aplicados y NA gestionados ──────────────────

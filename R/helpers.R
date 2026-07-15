@@ -109,10 +109,10 @@ scale_color_tableau_cb <- function(...) {
 }
 
 # ── Leer archivo CSV o Excel ───────────────────────────────
-leer_archivo <- function(path, ext) {
+leer_archivo <- function(path, ext, sep = ",") {
   tryCatch({
     if (ext == "csv") {
-      read_csv(path, show_col_types = FALSE)
+      read_delim(path, delim = sep, show_col_types = FALSE)
     } else if (ext %in% c("xlsx", "xls")) {
       read_excel(path)
     }

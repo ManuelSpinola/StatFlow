@@ -303,7 +303,26 @@ mod_graficos_server <- function(id, datos) {
     # ── Gráfico principal ──
     output$grafico_principal <- renderPlot({
       req(datos(), input$tipo_grafico, input$var_graf)
-      df    <- datos()
+      df <- datos()
+
+      # ── Evitar usar selecciones "viejas" de un dataset anterior ──
+      # Cuando cambia el dataset activo, los selectInput de variable/grupo se
+      # regeneran en el servidor (renderUI) y el nuevo valor tarda un
+      # instante en volver desde el navegador. Mientras tanto, input$var_graf
+      # / input$grupo_graf pueden seguir apuntando a una columna que ya no
+      # existe en el data.frame nuevo (ej.: "species" de un dataset anterior),
+      # lo que producía el error "Column `species` not found". req() con estas
+      # validaciones simplemente hace que el gráfico espere a que los inputs
+      # se pongan al día, en vez de fallar.
+      req(input$var_graf %in% names(df))
+      if (input$tipo_grafico == "dispersion") {
+        req(!is.null(input$var_y), input$var_y %in% names(df))
+      }
+      grupo_valido <- is.null(input$grupo_graf) ||
+        input$grupo_graf == "ninguno" ||
+        input$grupo_graf %in% names(df)
+      req(grupo_valido)
+
       color  <- color_activo()
       titulo <- titulo_activo()
       tipo   <- input$tipo_grafico

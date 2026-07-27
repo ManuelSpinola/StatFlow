@@ -45,7 +45,7 @@ mod_frecuencias_ui <- function(id) {
         card_body(
           uiOutput(ns("resultado_texto")),
           layout_columns(
-            col_widths = c(6, 6),
+            col_widths = bslib::breakpoints(sm = c(12, 12), xl = c(6, 6)),
             plotOutput(ns("grafico_proporciones"), height = "340px"),
             plotOutput(ns("grafico_diferencia"),   height = "340px")
           ),
@@ -280,7 +280,7 @@ mod_frecuencias_server <- function(id, datos) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1),
                            limits = c(0, 1)) +
         labs(
-          title   = paste0("Proporción de '", res$categoria, "' por grupo"),
+          title   = paste(strwrap(paste0("Proporción de '", res$categoria, "' por grupo"), width = 28), collapse = "\n"),
           x       = res$var_grupo,
           y       = "Proporción",
           caption = "● = proporción  |  barra = IC 95%"
@@ -317,7 +317,7 @@ mod_frecuencias_server <- function(id, datos) {
         ) +
         scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
         labs(
-          title   = "Diferencia de proporciones",
+          title   = paste(strwrap("Diferencia de proporciones", width = 24), collapse = "\n"),
           x       = paste0("Diferencia (", res$grupo_a, " − ", res$grupo_b, ")"),
           y       = NULL,
           caption = "Si la barra no cruza el 0, la diferencia es robusta"

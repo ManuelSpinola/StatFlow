@@ -45,9 +45,9 @@ mod_medias_ui <- function(id) {
         card_body(
           uiOutput(ns("resultado_texto")),
           layout_columns(
-            col_widths = c(6, 6),
-            plotOutput(ns("grafico_comparacion"), height = "480px"),
-            plotOutput(ns("grafico_efecto"),      height = "480px")
+            col_widths = bslib::breakpoints(sm = c(12, 12), xl = c(6, 6)),
+            plotOutput(ns("grafico_comparacion"), height = "420px"),
+            plotOutput(ns("grafico_efecto"),      height = "420px")
           ),
           uiOutput(ns("nota_grafico")),
           accordion(
@@ -130,6 +130,8 @@ mod_medias_server <- function(id, datos) {
       dif_pct <- if (media_b != 0) (dif_abs / abs(media_b)) * 100 else NA_real_
 
       # IC 95% de cada grupo
+      # (más abajo, una vez calculado ic_dif, se reescala también a porcentaje
+      # usando el mismo denominador que dif_pct, para que ambos sean consistentes)
       ic_a <- list(mean   = media_a,
                    lwr.ci = tt_a$conf.int[1],
                    upr.ci = tt_a$conf.int[2])
@@ -142,6 +144,13 @@ mod_medias_server <- function(id, datos) {
       ic_dif <- list(meandiff = tt_dif$estimate[1] - tt_dif$estimate[2],
                      lwr.ci   = tt_dif$conf.int[1],
                      upr.ci   = tt_dif$conf.int[2])
+
+      # ── IC 95% de la diferencia expresado en % ──
+      # Es el mismo IC de arriba, reescalado con el mismo denominador (media_b)
+      # que ya se usa para dif_pct. Dividir un IC por una constante conserva
+      # el nivel de confianza, así que esto es válido.
+      dif_pct_lwr <- if (media_b != 0) round((ic_dif$lwr.ci / abs(media_b)) * 100, 1) else NA_real_
+      dif_pct_upr <- if (media_b != 0) round((ic_dif$upr.ci / abs(media_b)) * 100, 1) else NA_real_
 
       # ── Cohen's d con effectsize ──
       ef     <- cohens_d(x_a, x_b)
@@ -167,6 +176,8 @@ mod_medias_server <- function(id, datos) {
         ic_dif   = ic_dif,
         dif_abs  = round(dif_abs, 2),
         dif_pct  = round(dif_pct, 1),
+        dif_pct_lwr = dif_pct_lwr,
+        dif_pct_upr = dif_pct_upr,
         d_val    = d_val,
         interp   = interp,
         df_filt  = df,
@@ -230,6 +241,12 @@ mod_medias_server <- function(id, datos) {
               " — rango de valores plausibles para la diferencia real entre los dos grupos."
             ),
             tags$p(
+              "Expresado como porcentaje (relativo a la media de ",
+              tags$strong(res$grupo_b), "), ese mismo intervalo es ",
+              tags$strong(sprintf("[%.1f%% – %.1f%%]", res$dif_pct_lwr, res$dif_pct_upr)),
+              "."
+            ),
+            tags$p(
               "El tamaño de esta diferencia es ",
               tags$strong(interp_es),
               sprintf(" (d de Cohen = %s).", res$d_val)
@@ -266,7 +283,7 @@ mod_medias_server <- function(id, datos) {
         ) +
         scale_color_manual(values = c(colores$primario, colores$acento)) +
         labs(
-          title   = paste("Comparación de", res$variable),
+          title   = paste(strwrap(paste("Comparación de", res$variable), width = 28), collapse = "\n"),
           x       = input$grupo_comp,
           y       = res$variable,
           caption = if (isTRUE(input$mostrar_puntos))
@@ -305,7 +322,7 @@ mod_medias_server <- function(id, datos) {
           fatten    = 4
         ) +
         labs(
-          title   = "Tamaño del efecto (diferencia cruda)",
+          title   = paste(strwrap("Tamaño del efecto (diferencia cruda)", width = 24), collapse = "\n"),
           x       = paste0("Diferencia de medias (", res$variable, ")"),
           y       = NULL,
           caption = "Si la barra no cruza el 0, la diferencia es robusta"

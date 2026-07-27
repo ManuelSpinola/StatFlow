@@ -295,8 +295,20 @@ mod_explorar_server <- function(id, datos) {
     # ── Resumen categórica ──
     output$tabla_cat_resumen <- renderTable({
       req(tipo_actual() == "Categórica")
-      x    <- var_activa()
-      moda <- names(sort(table(x), decreasing = TRUE))[1]
+      x        <- var_activa()
+      x_valido <- x[!is.na(x)]
+
+      # which.max() siempre devuelve exactamente 1 valor (el primero en caso
+      # de empate), a diferencia de sort(table(x))[1], que puede quedar con
+      # longitud distinta de 1 cuando hay 0 categorías válidas (todo NA) o
+      # empates raros, y eso rompía data.frame() con "differing number of rows".
+      moda <- if (length(x_valido) == 0) {
+        NA_character_
+      } else {
+        tab <- table(x_valido)
+        names(tab)[which.max(tab)]
+      }
+
       data.frame(
         Estadístico = c(
           "Total de observaciones",
@@ -305,11 +317,12 @@ mod_explorar_server <- function(id, datos) {
           "Categoría más frecuente (moda)"
         ),
         Valor = c(
-          length(x),
-          length(unique(x[!is.na(x)])),
-          sum(is.na(x)),
-          moda
-        )
+          as.character(length(x)),
+          as.character(length(unique(x_valido))),
+          as.character(sum(is.na(x))),
+          as.character(moda)
+        ),
+        stringsAsFactors = FALSE
       )
     }, striped = TRUE, hover = TRUE, bordered = TRUE)
 

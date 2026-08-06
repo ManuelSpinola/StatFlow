@@ -11,11 +11,13 @@ mod_medias_ui <- function(id) {
   tagList(
     layout_columns(
       col_widths = c(3, 9),
+      fill = FALSE,
 
       # ── Controles ──
       card(
         card_header(tagList(bs_icon("bar-chart"), " Opciones")),
         card_body(
+          fillable = FALSE,
           uiOutput(ns("sel_variable_comp")),
           uiOutput(ns("sel_grupo_comp")),
           hr(),
@@ -43,9 +45,11 @@ mod_medias_ui <- function(id) {
       card(
         card_header("Resultados de la comparación"),
         card_body(
+          fillable = FALSE,
           uiOutput(ns("resultado_texto")),
           layout_columns(
             col_widths = bslib::breakpoints(sm = c(12, 12), xl = c(6, 6)),
+            fill = FALSE,
             plotOutput(ns("grafico_comparacion"), height = "420px"),
             plotOutput(ns("grafico_efecto"),      height = "420px")
           ),
@@ -206,6 +210,7 @@ mod_medias_server <- function(id, datos) {
       tagList(
         layout_columns(
           col_widths = c(6, 6),
+          fill = FALSE,
           value_box(
             title    = paste("Media —", res$grupo_a),
             value    = paste0(res$media_a,
@@ -226,6 +231,7 @@ mod_medias_server <- function(id, datos) {
         br(),
         card(
           card_body(
+            fillable = FALSE,
             tags$p(
               tags$strong(grupo_mayor), " tiene una media de ",
               tags$strong(res$variable), " mayor que ",

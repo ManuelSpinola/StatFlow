@@ -10,11 +10,13 @@ mod_frecuencias_ui <- function(id) {
   tagList(
     layout_columns(
       col_widths = c(3, 9),
+      fill = FALSE,
 
       # ── Controles ──
       card(
         card_header(tagList(bs_icon("pie-chart"), " Opciones")),
         card_body(
+          fillable = FALSE,
           uiOutput(ns("sel_var_resultado")),
           uiOutput(ns("sel_categoria")),
           hr(),
@@ -43,9 +45,11 @@ mod_frecuencias_ui <- function(id) {
       card(
         card_header("Resultados de la comparación"),
         card_body(
+          fillable = FALSE,
           uiOutput(ns("resultado_texto")),
           layout_columns(
             col_widths = bslib::breakpoints(sm = c(12, 12), xl = c(6, 6)),
+            fill = FALSE,
             plotOutput(ns("grafico_proporciones"), height = "340px"),
             plotOutput(ns("grafico_diferencia"),   height = "340px")
           ),
@@ -223,6 +227,7 @@ mod_frecuencias_server <- function(id, datos) {
           ),
         layout_columns(
           col_widths = c(6, 6),
+          fill = FALSE,
           value_box(
             title    = paste0("Proporción — ", res$grupo_a,
                               " (", res$x_a, "/", res$n_a, ")"),
@@ -245,6 +250,7 @@ mod_frecuencias_server <- function(id, datos) {
         br(),
         card(
           card_body(
+            fillable = FALSE,
             tags$p(
               "La categoría ", tags$strong(paste0("'", res$categoria, "'")),
               " aparece con mayor frecuencia en ",
